@@ -6,8 +6,13 @@ from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
+import logging
+import easydict
+import tempfile
+import os
 
-from . import serializer
+from .models import Song
+from .serializers import SongSerializer
 from .lib import dataset
 from .lib import nets
 from .lib import spec_utils
@@ -21,7 +26,7 @@ import boto3
 import logging
 
 # Create your views here.
-logger = logging.getLogger('django.server')
+logger = logging.getLogger(__name__)
 class Separator(object):
 
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
@@ -116,8 +121,10 @@ class Separator(object):
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
-    serializer =serializer(data = request.data)
-    if request.method == 'POST':
+    serializer = SongSerializer(data = request.data)
+    
+    if serializer.is_valid():
+        logger.info(serializer.data)
         input_resource = serializer.validated_data['file']
         logger.info(request.POST)
         output_dir = serializer.validated_data['output_dir']
@@ -125,20 +132,28 @@ def inference(request):
         songId = serializer.validated_data['songId']
         if(serializer.validated_data['isUser']==True):
             userId = serializer.validated_data['userId']
-
-            
-    p = argparse.ArgumentParser()
-    # p.add_argument('--gpu', '-g', type=int, default=-1)
-    p.add_argument('--pretrained_model', '-P', type=str, default='models/baseline.pth')
-    # p.add_argument('--input', '-i', required=True)
-    p.add_argument('--sr', '-r', type=int, default=44100)
-    p.add_argument('--n_fft', '-f', type=int, default=2048)
-    p.add_argument('--hop_length', '-H', type=int, default=1024)
-    p.add_argument('--batchsize', '-B', type=int, default=4)
-    p.add_argument('--cropsize', '-c', type=int, default=256)
-    # p.add_argument('--tta', '-t', action='store_true')
-    # p.add_argument('--output_dir', '-o', type=str, default="")
-    args = p.parse_args()
+    else:
+        logger.info("serializer 오류 발생")
+    args = easydict.EasyDict({
+        "pretrained_model" : 'C:/Users/김우영/Documents/2023-2/django/songssam/models/baseline.pth',
+        "sr" : 44100,
+        "n_fft" : 2048,
+        "hop_length" : 1024,
+        "batchsize" : 4,
+        "cropsize" : 256
+    })
+    # p = argparse.ArgumentParser()
+    # # p.add_argument('--gpu', '-g', type=int, default=-1)
+    # p.add_argument('--pretrained_model', '-P', type=str, default='models/baseline.pth')
+    # # p.add_argument('--input', '-i', required=True)
+    # p.add_argument('--sr', '-r', type=int, default=44100)
+    # p.add_argument('--n_fft', '-f', type=int, default=2048)
+    # p.add_argument('--hop_length', '-H', type=int, default=1024)
+    # p.add_argument('--batchsize', '-B', type=int, default=4)
+    # p.add_argument('--cropsize', '-c', type=int, default=256)
+    # # p.add_argument('--tta', '-t', action='store_true')
+    # # p.add_argument('--output_dir', '-o', type=str, default="")
+    # args = p.parse_args()
     gpu = -1
     
     s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='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')
@@ -156,11 +171,12 @@ def inference(request):
     logger.info('model done')
     try:
         logger.info('loading wave source...')
-        with tempfile.NamedTemporaryFile(suffix=".wav",delete=True) as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=".mp3",delete=True,dir = 'C:/Users/김우영/Documents/2023-2/django/songssam/tmp') as temp_file:
             temp_file.write(input_resource.read())
             temp_file.flush()
+            temp_file.seek(0)
             X, sr = librosa.load(
-                input_resource, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+                temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
             if X.ndim == 1:
             # mono to stereo
                 X = np.asarray([X, X])
@@ -202,6 +218,8 @@ def inference(request):
                 sf.write(byte_io,'wav', wave.T, sr)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+songId)
                 logger.info('write done')
+            
+            
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
         error_message = str(e)

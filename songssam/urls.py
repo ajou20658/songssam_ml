@@ -1,8 +1,7 @@
-from django.urls import include,path
-from rest_framework import routers
+from django.urls import path
 from .views import inference,extract_mfcc
 
-urlppatterns = [
-    path('post/',inference)
+urlpatterns = [
+    path('post/',inference),
     path('get/',extract_mfcc)
 ]
