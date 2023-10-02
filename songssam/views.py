@@ -135,12 +135,13 @@ def inference(request):
     else:
         logger.info("serializer 오류 발생")
     args = easydict.EasyDict({
-        "pretrained_model" : 'C:/Users/김우영/Documents/2023-2/django/songssam/models/baseline.pth',
+        "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
         "sr" : 44100,
         "n_fft" : 2048,
         "hop_length" : 1024,
         "batchsize" : 4,
-        "cropsize" : 256
+        "cropsize" : 256,
+        "postprocess" : 'store_true'
     })
     # p = argparse.ArgumentParser()
     # # p.add_argument('--gpu', '-g', type=int, default=-1)
@@ -171,7 +172,7 @@ def inference(request):
     logger.info('model done')
     try:
         logger.info('loading wave source...')
-        with tempfile.NamedTemporaryFile(suffix=".mp3",delete=True,dir = 'C:/Users/김우영/Documents/2023-2/django/songssam/tmp') as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = '/home/ubuntu/git/songssam_ml/songssam/tmp') as temp_file:
             temp_file.write(input_resource.read())
             temp_file.flush()
             temp_file.seek(0)
