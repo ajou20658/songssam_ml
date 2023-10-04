@@ -176,6 +176,13 @@ def inference(request):
             temp_file.write(input_resource.read())
             temp_file.flush()
             temp_file.seek(0)
+            audio_format = temp_file.readframes(0)
+            if audio_format == b'\x10\x00':  # PCM_16 포맷
+                audio_format2 = "PCM_16"
+            elif audio_format == b'\x18\x00':  # PCM_24 포맷
+                audio_format2 = "PCM_24"
+            else:
+                print("Unknown audio format.")
             X, sr = librosa.load(
                 temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
             if X.ndim == 1:
@@ -201,7 +208,7 @@ def inference(request):
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
                 logger.info('spectorgram_to_wave done')
                 byte_io = BytesIO()
-                sf.write(byte_io,wave.T,sr,format='wav')
+                sf.write(byte_io,wave.T,sr,audio_format2)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="user/"+str(userId)+"_"+str(songId),ContentType="audio/wav")
             else:
                 logger.info('spectrogram_to_wave')
@@ -209,14 +216,14 @@ def inference(request):
                 logger.info('spectorgram_to_wave done')
                 byte_io = BytesIO()
                 logger.info('write start')
-                sf.write(byte_io,wave.T,sr,format='wav')
+                sf.write(byte_io,wave.T,sr,audio_format2)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+str(songId),ContentType = "audio/wav")
                 logger.info('write done')
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
                 logger.info('spectorgram_to_wave done')
                 logger.info('write start')
-                sf.write(byte_io,wave.T,sr,format='wav')
+                sf.write(byte_io,wave.T,sr,audio_format2)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+str(songId),ContentType = "audio/wav")
                 logger.info('write done')
             
