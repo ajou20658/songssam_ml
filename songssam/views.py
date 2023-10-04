@@ -210,14 +210,14 @@ def inference(request):
                 byte_io = BytesIO()
                 logger.info('write start')
                 sf.write(byte_io,wave.T,sr)
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+songId)
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+songId,ContentType = "audio/wav")
                 logger.info('write done')
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
                 logger.info('spectorgram_to_wave done')
                 logger.info('write start')
                 sf.write(byte_io, wave.T, sr)
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+songId)
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+songId,ContentType = "audio/wav")
                 logger.info('write done')
             
             
