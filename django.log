@@ -2100,3 +2100,126 @@ loading wave source...
 Length Required: /songssam/post/
 C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+Internal Server Error: /songssam/post/
+Traceback (most recent call last):
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py", line 164, in inference
+    model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\serialization.py", line 791, in load
+    with _open_file_like(f, 'rb') as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\serialization.py", line 271, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\serialization.py", line 252, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C/Users/±è¿ì¿µ/Documents/2023-2/django/songssam/models/baseline.pth'
+C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 2] No such file or directory: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\C\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpjmjvk4yz.wav'
+Length Required: /songssam/post/
+C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpjb5sumwr.wav'
+Length Required: /songssam/post/
+C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmphbrifa7d.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmp3pp3mrfq.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpnifoiwyy.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpmegvq8uo.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmp07z_3fqm.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmp34ly6oag.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpc6zi5n8a.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpd18wsbja.wav'
+Length Required: /songssam/post/
+{'file': None, 'output_dir': 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python', 'isUser': 'False', 'songId': 36518341}
+<QueryDict: {'output_dir': ['C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\python'], 'isUser': ['False'], 'songId': ['36518341']}>
+model done
+loading wave source...
+[Errno 13] Permission denied: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\django\\songssam\\tmp\\tmpxla9x5lq.wav'
+Length Required: /songssam/post/
+C:\Users\±è¿ì¿µ\Documents\2023-2\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
