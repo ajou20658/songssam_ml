@@ -202,7 +202,7 @@ def inference(request):
                 logger.info('spectorgram_to_wave done')
                 byte_io = BytesIO()
                 sf.write(byte_io,wave.T,sr,format='wav')
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="user/"+userId+"_"+songId,ContentType="audio/wav")
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="user/"+str(userId)+"_"+str(songId),ContentType="audio/wav")
             else:
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
@@ -210,14 +210,14 @@ def inference(request):
                 byte_io = BytesIO()
                 logger.info('write start')
                 sf.write(byte_io,wave.T,sr,format='wav')
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+songId,ContentType = "audio/wav")
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+str(songId),ContentType = "audio/wav")
                 logger.info('write done')
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
                 logger.info('spectorgram_to_wave done')
                 logger.info('write start')
                 sf.write(byte_io,wave.T,sr,format='wav')
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+songId,ContentType = "audio/wav")
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+str(songId),ContentType = "audio/wav")
                 logger.info('write done')
             
             
