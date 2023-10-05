@@ -18,6 +18,7 @@ from .lib import nets
 from .lib import spec_utils
 from .lib import utils
 
+import magic
 import librosa
 import numpy as np
 import soundfile as sf
@@ -117,7 +118,10 @@ class Separator(object):
         y_spec, v_spec = self._postprocess(mask, X_mag, X_phase)
 
         return y_spec, v_spec
-
+def detect_file_type(file_path):
+    mime = magic.Magic()
+    file_type = mime.from_file(file_path)
+    return file_path
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
@@ -176,13 +180,6 @@ def inference(request):
             temp_file.write(input_resource.read())
             temp_file.flush()
             temp_file.seek(0)
-            audio_format = temp_file.readframes(0)
-            if audio_format == b'\x10\x00':  # PCM_16 포맷
-                audio_format2 = "PCM_16"
-            elif audio_format == b'\x18\x00':  # PCM_24 포맷
-                audio_format2 = "PCM_24"
-            else:
-                print("Unknown audio format.")
             X, sr = librosa.load(
                 temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
             if X.ndim == 1:
@@ -202,7 +199,7 @@ def inference(request):
             logger.info('done')
 
             print('inverse stft of instruments...', end=' ')
-            
+            logger.info(detect_file_type(temp_file))
             if(isUser == True):
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
