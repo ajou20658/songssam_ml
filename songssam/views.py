@@ -199,7 +199,7 @@ def inference(request):
             logger.info('done')
 
             print('inverse stft of instruments...', end=' ')
-            logger.info(detect_file_type(temp_file))
+            logger.info(detect_file_type(temp_file.name))
             if(isUser == True):
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
