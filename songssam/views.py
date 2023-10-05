@@ -121,7 +121,13 @@ class Separator(object):
 def detect_file_type(file_path):
     mime = magic.Magic()
     file_type = mime.from_file(file_path)
-    return file_path
+    if(file_type.__contains__("PCM, 16")):
+        return "PCM_16"
+    elif(file_type.__contains__("PCM_24")):
+        return "PCM_24"
+    elif(file_type.__contains__("PCM_32")):
+        return "PCM_32"
+    return "Type Err"
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
@@ -185,6 +191,9 @@ def inference(request):
             if X.ndim == 1:
             # mono to stereo
                 X = np.asarray([X, X])
+            audio_format2 = detect_file_type(temp_file.name)
+            if(audio_format2=="Type Err"):
+                return JsonResponse({"error":"error"},status = 411)
             X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
             logger.info('loading wave done')
 
@@ -199,7 +208,7 @@ def inference(request):
             logger.info('done')
 
             print('inverse stft of instruments...', end=' ')
-            logger.info(detect_file_type(temp_file.name))
+            
             if(isUser == True):
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
@@ -223,8 +232,6 @@ def inference(request):
                 sf.write(byte_io,wave.T,sr,audio_format2)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+str(songId),ContentType = "audio/wav")
                 logger.info('write done')
-            
-            
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
         error_message = str(e)
