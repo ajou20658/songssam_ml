@@ -215,7 +215,9 @@ def inference(request):
                 logger.info('spectorgram_to_wave done')
                 byte_io = BytesIO()
                 sf.write(byte_io,wave.T,sr,subtype = audio_format2,format='WAV')
+                byte_io.seek(0) #포인터 돌려주기
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="user/"+str(userId)+"_"+str(songId),ContentType="audio/wav")
+                byte_io.close()
             else:
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
@@ -223,14 +225,21 @@ def inference(request):
                 byte_io = BytesIO()
                 logger.info('write start')
                 sf.write(byte_io,wave.T,sr,subtype = audio_format2,format='WAV')
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+str(songId),ContentType = "audio/wav")
+                byte_io.seek(0) #포인터 돌려주기
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="inst/"+str(songId)+".wav",ContentType = "audio/wav")
                 logger.info('write done')
+
+
+
                 logger.info('spectrogram_to_wave')
                 wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
                 logger.info('spectorgram_to_wave done')
+                byte_io.seek(0) #포인터 돌려주기
                 logger.info('write start')
                 sf.write(byte_io,wave.T,sr,subtype = audio_format2,format='WAV')
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+str(songId),ContentType = "audio/wav")
+                byte_io.seek(0) #포인터 돌려주기
+                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key="vocal/"+str(songId)+".wav",ContentType = "audio/wav")
+                byte_io.close()
                 logger.info('write done')
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
