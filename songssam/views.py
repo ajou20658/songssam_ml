@@ -123,12 +123,7 @@ class Separator(object):
 
         return y_spec, v_spec
 
-def split_and_zip(filepath):
-    audio = AudioSegment.from_file(filepath)
-    segment_duration = 15*1000
-    output_directory = filepath
-    
-def split_audio(input_audio_file, output_audio_dir):
+def split_audio_silent(input_audio_file, output_audio_dir):
     # 오디오 파일 로드
     audio = AudioSegment.from_file(input_audio_file)
 
@@ -183,6 +178,10 @@ def detect_file_type(file_path):
     elif(file_type.__contains__("PCM_32")):
         return "PCM_32"
     return "Type Err"
+
+def split_audio_slicing(expectedtime, input_audio_file,output_audio_dir):
+    audio = A
+
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
@@ -258,7 +257,7 @@ def inference(request):
                 logger.info('저장중...')
                 output_file_path = str(uuid)+".wav"
                 sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
-                split_audio(output_file_path,tmp_path+"/silent_noise")
+                split_audio_silent(output_file_path,tmp_path+"/silent_noise")
 
                 #압축파일 전송
                 folder_to_7z(tmp_path+"/slient_noise",tmp_path)
@@ -287,7 +286,7 @@ def inference(request):
                 logger.info('저장중...')
                 output_file_path = str(uuid)+".wav"
                 sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
-                split_audio(output_file_path,tmp_path+"/silent_noise")
+                split_audio_silent(output_file_path,tmp_path+"/silent_noise")
 
                 #압축파일 전송
                 folder_to_7z(tmp_path+"/slient_noise",tmp_path)
