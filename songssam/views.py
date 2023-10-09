@@ -191,7 +191,6 @@ def inference(request):
         logger.info(serializer.data)
         input_resource = serializer.validated_data['file']
         logger.info(request.POST)
-        output_dir = serializer.validated_data['output_dir']
         isUser = serializer.validated_data['isUser']
         songId = serializer.validated_data['songId']
         uuid = serializer.validated_data['uuid']
@@ -242,12 +241,6 @@ def inference(request):
             sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
 
             y_spec, v_spec = sp.separate_tta(X_spec)
-
-            logger.info('validating output directory...')
-            if output_dir != "":  # modifies output_dir if theres an arg specified
-                output_dir = output_dir.rstrip('/') + '/'
-                os.makedirs(output_dir, exist_ok=True)
-            logger.info('done')
 
             print('inverse stft of instruments...', end=' ')
             
