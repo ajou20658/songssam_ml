@@ -188,14 +188,9 @@ def inference(request):
     serializer = SongSerializer(data = request.data)
     
     if serializer.is_valid():
-        logger.info(serializer.data)
         input_resource = serializer.validated_data['file']
-        logger.info(request.POST)
         isUser = serializer.validated_data['isUser']
-        songId = serializer.validated_data['songId']
         uuid = serializer.validated_data['uuid']
-        if(serializer.validated_data['isUser']==True):
-            userId = serializer.validated_data['userId']
     else:
         logger.info("serializer 오류 발생")
     args = easydict.EasyDict({

@@ -4,8 +4,5 @@ from django.db import models
 class Song:
     def __init__(self, file, output_dir, isUser, songId, userId, uuid):
         self.file = file
-        self.output_dir = output_dir
         self.isUser = isUser
-        self.songId = songId
-        self.userId = userId
         self.uuid = uuid
