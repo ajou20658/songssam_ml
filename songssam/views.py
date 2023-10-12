@@ -30,6 +30,7 @@ import soundfile as sf
 import torch
 import boto3
 import logging
+import audioread
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -199,6 +200,14 @@ def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 �
     logger.info("split complete")
     return filenum
 
+def load_audio_file(file_path, sr=None):
+    with audioread.audio_open(file_path) as audio:
+        sr = audio.samplerate if sr is None else sr
+        audio_data = []
+        for frame in audio:
+            audio_data.append(frame)
+    return librosa.core.audio.__audioread_load(audio_data, sr, mono=False)
+
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
@@ -242,8 +251,9 @@ def inference(request):
             temp_file.write(input_resource.readframes(input_resource.getnframes()))
             temp_file.flush()
             temp_file.seek(0)
-            X, sr = librosa.load(
-                temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            X, sr = load_audio_file(temp_file.name, sr=args.sr)
+            # X, sr = librosa.load(
+            #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
             if X.ndim == 1:
             # mono to stereo
                 X = np.asarray([X, X])
@@ -311,33 +321,3 @@ def inference(request):
         return JsonResponse({"error":"error"},status = 411)
     finally:
         input_resource.close()
-    
-def extract_mfcc(filepath):
-    # MFCC 계산
-    y, sr = librosa.load(filepath, sr=None)  # sr=None으로 설정하여 원본 샘플링 속도로 읽음
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)  # MFCC 계산 (20개의 계수)
-    feature = []
-
-    # 각 MFCC 계수의 평균 계산
-    mfcc_mean = np.mean(mfcc, axis=1)
-
-    # 음역대 특성 추출
-    # 각 음역대에 해당하는 MFCC 계수 범위를 선택하여 평균 계산
-    very_low_range_feature = np.mean(mfcc_mean[:4])  # 매우 낮은 주파수 대역 (예: 처음 4개 계수의 평균)
-    low_range_feature = np.mean(mfcc_mean[4:8])  # 낮은 주파수 대역 (예: 5~8번째 계수의 평균)
-    mid_range_feature = np.mean(mfcc_mean[8:12])  # 중간 주파수 대역 (예: 9~12번째 계수의 평균)
-    high_range_feature = np.mean(mfcc_mean[12:16])  # 높은 주파수 대역 (예: 13~16번째 계수의 평균)
-    very_high_range_feature = np.mean(mfcc_mean[16:])  # 매우 높은 주파수 대역 (예: 17번째 이후 계수의 평균)
-    
-    feature.append([very_low_range_feature, low_range_feature, mid_range_feature, high_range_feature, very_high_range_feature])
-
-    # 음역대 특성 출력
-    print("매우 낮은 주파수 대역 특성:", very_low_range_feature)
-    print("낮은 주파수 대역 특성:", low_range_feature)
-    print("중간 주파수 대역 특성:", mid_range_feature)
-    print("높은 주파수 대역 특성:", high_range_feature)
-    print("매우 높은 주파수 대역 특성:", very_high_range_feature)
-    
-    
-    return JsonResponse({'feature':feature})
-
