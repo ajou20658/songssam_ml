@@ -204,7 +204,7 @@ def inference(request):
     serializer = SongSerializer(data = request.data)
     logger.info(serializer)
     if serializer.is_valid():
-        fileKey = serializer.validated_data['Key']
+        fileKey = serializer.validated_data['fileKey']
         isUser = serializer.validated_data['isUser']
         uuid = serializer.validated_data['uuid']
     else:
@@ -286,11 +286,12 @@ def inference(request):
             logger.info("file_list = ",file_list)
             name = file_list[0].split('_')
             logger.info(name)
-            if(name[1]=="YES"){
+            if(name[1]=="YES"):
+                logger.info("yes")
+            else:
+                logger.info("No")
 
-            }else{
-
-            }
+            
 
 
 
