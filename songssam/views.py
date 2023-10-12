@@ -201,13 +201,13 @@ def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 �
     logger.info("split complete")
     return filenum
 
-def load_audio_file(file_path, sr=None):
+def load_audio_file(file_path, target_sr=None):
     with audioread.audio_open(file_path) as audio:
-        sr = audio.samplerate if sr is None else sr
+        sr = audio.samplerate
         audio_data = []
         for frame in audio:
             audio_data.append(frame)
-    return librosa.core.audio.__audioread_load(audio_data, sr, mono=False)
+    return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
 
 @csrf_exempt
 @api_view(['POST'])
@@ -258,11 +258,12 @@ def inference(request):
             temp_file.write(input_resource.readframes(input_resource.getnframes()))
             temp_file.flush()
             temp_file.seek(0)
-            
-            X, sr = load_audio_file(temp_file.name, sr=args.sr)
+            logger.info("왜 파일 생성이 안되니")
+            #여기까진 됨
+            X,sr= load_audio_file(temp_file.name, sr=args.sr)
             # X, sr = librosa.load(
             #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
-            
+            #
             
             if X.ndim == 1:
             # mono to stereo
@@ -326,10 +327,10 @@ def inference(request):
         delete_files_in_folder(tmp_path+"/slient_noise")
         #tmp폴더 비우기
         delete_files_in_folder(tmp_path)
+        return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
         return JsonResponse({"error":"error"},status = 411)
     finally:
         input_resource.close()
-        return JsonResponse({"message":"Success"},status=200)
