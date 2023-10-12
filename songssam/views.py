@@ -179,6 +179,7 @@ def extract_7z(file_path,extract_dir):
 def detect_file_type(file_path):
     mime = magic.Magic()
     file_type = mime.from_file(file_path)
+    logger.info("file type: ",file_type)
     if(file_type.__contains__("PCM, 16")):
         return "PCM_16"
     elif(file_type.__contains__("PCM_24")):
@@ -219,6 +220,12 @@ def inference(request):
         uuid = serializer.validated_data['uuid']
     else:
         logger.info("serializer 오류 발생")
+    
+    # if not os.path.exists(tmp_path+"/"+str(uuid)):
+    #     os.makedirs(tmp_path+"/"+str(uuid))
+    # else:
+    #     logger.info("folder already exists")
+
     s3.download_file(bucket,fileKey,tmp_path+"/"+str(uuid))
     try:
         input_resource = wave.open(tmp_path+"/"+str(uuid),'rb')
@@ -255,72 +262,74 @@ def inference(request):
             X, sr = load_audio_file(temp_file.name, sr=args.sr)
             # X, sr = librosa.load(
             #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
-            logger.info("file data, sr extract done")
+            
             
             if X.ndim == 1:
             # mono to stereo
                 X = np.asarray([X, X])
             audio_format2 = detect_file_type(temp_file.name)
-            if(audio_format2=="Type Err"):
-                return JsonResponse({"error":"wrong type error"},status = 411)
-            X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
-            logger.info('loading wave done')
+        logger.info("file data, sr extract...")
+        if(audio_format2=="Type Err"):
 
-            sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
+            return JsonResponse({"error":"wrong type error"},status = 411)
+        X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
+        
 
-            y_spec, v_spec = sp.separate_tta(X_spec)
+        sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
 
-            print('inverse stft of instruments...', end=' ')
-            
-            if(isUser != True):
-                logger.info('MR loading...')
-                waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
-                logger.info('저장중...')
-                byte_io = BytesIO()
-                sf.write(byte_io,waveT.T,sr,subtype = audio_format2,format='WAV')
-                byte_io.seek(0) #포인터 돌려주기
+        y_spec, v_spec = sp.separate_tta(X_spec)
 
-                s3_key = "inst/"+str(uuid)
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType = "audio/wav")
-                
-                byte_io.close()
-
-            ##########################################################
-            logger.info('보컬 loading...')
-            waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
+        print('inverse stft of instruments...', end=' ')
+        
+        if(isUser != True):
+            logger.info('MR loading...')
+            waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
             logger.info('저장중...')
-            output_file_path = str(uuid)+".wav"
-            sf.write(output_file_path,waveT.T,sr,subtype = audio_format2,format='WAV')
-            split_path = tmp_path+"/silent_noise"
-            FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
-            ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
-            ##파일 {No}_YES,{No}_No가 반복됨
-            logger.info("splited count = ",FileCount)
-            file_list = glob.glob(split_path+'/*')
-            logger.info("file_list = ",file_list)
-            name = file_list[0].split('_')
-            logger.info(name)
-            if(name[1]=="YES"):
-                logger.info("yes")
-            else:
-                logger.info("No")
+            byte_io = BytesIO()
+            sf.write(byte_io,waveT.T,sr,subtype = audio_format2,format='WAV')
+            byte_io.seek(0) #포인터 돌려주기
 
+            s3_key = "inst/"+str(uuid)
+            s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType = "audio/wav")
             
+            byte_io.close()
+
+        ##########################################################
+        logger.info('보컬 loading...')
+        waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
+        logger.info('저장중...')
+        output_file_path = str(uuid)+".wav"
+        sf.write(output_file_path,waveT.T,sr,subtype = audio_format2,format='WAV')
+        split_path = tmp_path+"/silent_noise"
+        FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
+        ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
+        ##파일 {No}_YES,{No}_No가 반복됨
+        logger.info("splited count = ",FileCount)
+        file_list = glob.glob(split_path+'/*')
+        logger.info("file_list = ",file_list)
+        name = file_list[0].split('_')
+        logger.info(name)
+        if(name[1]=="YES"):
+            logger.info("yes")
+        else:
+            logger.info("No")
+
+        
 
 
 
-            #압축파일 전송
-            folder_to_7z(tmp_path+"/slient_noise",tmp_path)
-            s3_key = "vocal/"+str(uuid)
-            s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
-            #silent_noise폴더 비우기
-            delete_files_in_folder(tmp_path+"/slient_noise")
-            #tmp폴더 비우기
-            delete_files_in_folder(tmp_path)
-        return JsonResponse({"message":"Success"},status=200)
+        #압축파일 전송
+        folder_to_7z(tmp_path+"/slient_noise",tmp_path)
+        s3_key = "vocal/"+str(uuid)
+        s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
+        #silent_noise폴더 비우기
+        delete_files_in_folder(tmp_path+"/slient_noise")
+        #tmp폴더 비우기
+        delete_files_in_folder(tmp_path)
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
         return JsonResponse({"error":"error"},status = 411)
     finally:
         input_resource.close()
+        return JsonResponse({"message":"Success"},status=200)
