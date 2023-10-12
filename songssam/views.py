@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from django.http import HttpResponse, JsonResponse
-from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
@@ -14,16 +12,14 @@ import easydict
 import tempfile
 import os
 import glob
+import io
 
-from .models import Song
 from .serializers import SongSerializer
 from .lib import dataset
 from .lib import nets
 from .lib import spec_utils
 from .lib import utils
 
-import io
-import ffmpeg
 import wave
 import magic
 import librosa
@@ -257,7 +253,12 @@ def inference(request):
         
         logger.info('loading wave source...')
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = tmp_path) as temp_file:
-            temp_file.write(io.BytesIO(input_resource.readframes(input_resource.getnframes())))
+            framecount = input_resource.getnframes()
+            # framerate = input_resource.getframerate()
+            # logger.info(framecount)
+            # logger.info(framerate)
+            audio_bytes = input_resource.readframes(framecount)
+            temp_file.write(io.BytesIO(audio_bytes))
             temp_file.flush()
             temp_file.seek(0)
             logger.info("왜 파일 생성이 안되니")
