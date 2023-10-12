@@ -260,7 +260,13 @@ def inference(request):
             temp_file.seek(0)
             logger.info("왜 파일 생성이 안되니")
             #여기까진 됨
-            X,sr= load_audio_file(temp_file.name, sr=args.sr)
+            with audioread.audio_open(temp_file.name) as audio:
+                sr = audio.samplerate
+                audio_data = []
+                for frame in audio:
+                    audio_data.append(frame)
+                X = librosa.core.audio.__audioread_load(audio_data,args.sr,mono=False)
+            
             # X, sr = librosa.load(
             #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
             #
