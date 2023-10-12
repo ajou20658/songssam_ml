@@ -223,10 +223,11 @@ def inference(request):
     #     os.makedirs(tmp_path+"/"+str(uuid))
     # else:
     #     logger.info("folder already exists")
-
-    s3.download_file(bucket,fileKey,tmp_path+"/"+str(uuid))
+    filename=tmp_path+"/"+str(uuid)
+    s3.download_file(bucket,fileKey,filename)
     try:
-        input_resource = wave.open(tmp_path+"/"+str(uuid),'rb')
+        
+        input_resource = wave.open(filename,'rb')
         args = easydict.EasyDict({
             "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
             "sr" : 44100,
@@ -258,7 +259,7 @@ def inference(request):
         if X.ndim == 1:
         # mono to stereo
             X = np.asarray([X, X])
-        audio_format2 = detect_file_type(temp_file.name)
+        audio_format2 = detect_file_type(filename)
         logger.info("file data, sr extract...")
         if(audio_format2=="Type Err"):
 
