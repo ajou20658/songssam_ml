@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Song
 
 class SongSerializer(serializers.Serializer):
-    file = serializers.FileField()
+    fileKey = serializers.CharField(max_length=100)
     isUser = serializers.CharField(max_length=10)
     uuid = serializers.CharField(max_length=100)
 
@@ -10,7 +10,7 @@ class SongSerializer(serializers.Serializer):
         return Song(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.file = validated_data.get('file', instance.file)
+        instance.fileKey = validated_data.get('fileKey', instance.fileKey)
         instance.isUser = validated_data.get('isUser', instance.isUser)
         instance.uuid = validated_data.get('uuid',instance.uuid)
         return instance

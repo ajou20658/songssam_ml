@@ -13,6 +13,7 @@ import logging
 import easydict
 import tempfile
 import os
+import glob
 
 from .models import Song
 from .serializers import SongSerializer
@@ -32,7 +33,11 @@ import logging
 # Create your views here.
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='nSCu5JPOudC5xxtNnuCePDo+MRdJeXmnJxWQhd9Q')
+bucket = "songssam.site"
+
 tmp_path = "/home/ubuntu/git/songssam_ml/songssam/tmp"
+
+
 class Separator(object):
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
         self.model = model
@@ -131,22 +136,23 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     non_silent_ranges = audio.detect_silence(silence_thresh=-40, min_silence_len=5000, seek_step=1000)
 
     # 음성과 음성 없는 구간 번갈아가면서 저장
-    segment_counter = 1
+    segment_counter = 0
     is_silent_segment = False
 
     for start, end in non_silent_ranges:
         if is_silent_segment:
             segment = audio[start:end]
-            output_file = f"{output_audio_dir}/음성_{segment_counter}.wav"
+            output_file = f"{output_audio_dir}/{segment_counter}_YES.wav"
             segment.export(output_file, format="wav")
         else:
             silent_start = start
             silent_end = end
             segment = audio[silent_start:silent_end]
-            output_file = f"{output_audio_dir}/음성_없음_{segment_counter}.wav"
+            output_file = f"{output_audio_dir}/{segment_counter}_NO.wav"
             segment.export(output_file, format="wav")
         is_silent_segment = not is_silent_segment
         segment_counter += 1
+    return segment_counter
 
 def delete_files_in_folder(folder_path):
     for filename in os.listdir(folder_path):
@@ -179,44 +185,57 @@ def detect_file_type(file_path):
         return "PCM_32"
     return "Type Err"
 
-def split_audio_slicing(expectedtime, input_audio_file,output_audio_dir):
-    audio = A
+def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 경로
+    segment_length_ms = 10000
+    audio = AudioSegment.from_wav(input_audio_file)
+    
+    for start_time in range(0,len(audio),segment_length_ms):
+        end_time = start_time + segment_length_ms
+        segment = audio[start_time:end_time]
+        output_file_path = f"{output_audio_dir}/{filenum}_YES.wav"
+        segment.export(output_file_path,format="wav")
+        filenum += 1
+    logger.info("split complete")
+    return filenum
 
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
     serializer = SongSerializer(data = request.data)
-    
+    logger.info(serializer)
     if serializer.is_valid():
-        input_resource = serializer.validated_data['file']
+        fileKey = serializer.validated_data['Key']
         isUser = serializer.validated_data['isUser']
         uuid = serializer.validated_data['uuid']
     else:
         logger.info("serializer 오류 발생")
-    args = easydict.EasyDict({
-        "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
-        "sr" : 44100,
-        "n_fft" : 2048,
-        "hop_length" : 1024,
-        "batchsize" : 4,
-        "cropsize" : 256,
-        "postprocess" : 'store_true'
-    })
-    gpu = -1
-    
-    print('loading model...', end=' ')
-    device = torch.device('cpu')
-    model = nets.CascadedNet(args.n_fft, 32, 128)
-    model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
-    if gpu >= 0:
-        if torch.cuda.is_available():
-            device = torch.device('cuda:{}'.format(gpu))
-            model.to(device)
-        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-            device = torch.device('mps')
-            model.to(device)
-    logger.info('model done')
+    s3.download_file(bucket,fileKey,tmp_path+"/uuid")
     try:
+        input_resource = wave.open(tmp_path+"/uuid",'rb')
+        args = easydict.EasyDict({
+            "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
+            "sr" : 44100,
+            "n_fft" : 2048,
+            "hop_length" : 1024,
+            "batchsize" : 4,
+            "cropsize" : 256,
+            "postprocess" : 'store_true'
+        })
+        gpu = -1
+        
+        print('loading model...', end=' ')
+        device = torch.device('cpu')
+        model = nets.CascadedNet(args.n_fft, 32, 128)
+        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+        if gpu >= 0:
+            if torch.cuda.is_available():
+                device = torch.device('cuda:{}'.format(gpu))
+                model.to(device)
+            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+                device = torch.device('mps')
+                model.to(device)
+        logger.info('model done')
+        
         logger.info('loading wave source...')
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = tmp_path) as temp_file:
             temp_file.write(input_resource.read())
@@ -239,24 +258,7 @@ def inference(request):
 
             print('inverse stft of instruments...', end=' ')
             
-            if(isUser == True):
-                logger.info('보컬 loading...')
-                wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
-                logger.info('저장중...')
-                output_file_path = str(uuid)+".wav"
-                sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
-                split_audio_silent(output_file_path,tmp_path+"/silent_noise")
-
-                #압축파일 전송
-                folder_to_7z(tmp_path+"/slient_noise",tmp_path)
-                s3_key = "user/"+str(uuid)+"_"+str(songId)
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
-                #silent_noise폴더 비우기
-                delete_files_in_folder(tmp_path+"/slient_noise")
-                #tmp폴더 비우기
-                delete_files_in_folder(tmp_path)
-
-            else:
+            if(isUser != True):
                 logger.info('MR loading...')
                 wave = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
                 logger.info('저장중...')
@@ -264,33 +266,49 @@ def inference(request):
                 sf.write(byte_io,wave.T,sr,subtype = audio_format2,format='WAV')
                 byte_io.seek(0) #포인터 돌려주기
 
-                s3_key = "inst/"+str(uuid)+"_"+str(songId)
+                s3_key = "inst/"+str(uuid)
                 s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType = "audio/wav")
                 
                 byte_io.close()
-                ##########################################################
-                logger.info('보컬 loading...')
-                wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
-                logger.info('저장중...')
-                output_file_path = str(uuid)+".wav"
-                sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
-                split_audio_silent(output_file_path,tmp_path+"/silent_noise")
 
-                #압축파일 전송
-                folder_to_7z(tmp_path+"/slient_noise",tmp_path)
-                s3_key = "vocal/"+str(uuid)+"_"+str(songId)
-                s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
-                #silent_noise폴더 비우기
-                delete_files_in_folder(tmp_path+"/slient_noise")
-                #tmp폴더 비우기
-                delete_files_in_folder(tmp_path)
+            ##########################################################
+            logger.info('보컬 loading...')
+            wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
+            logger.info('저장중...')
+            output_file_path = str(uuid)+".wav"
+            sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
+            split_path = tmp_path+"/silent_noise"
+            FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
+            ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
+            ##파일 {No}_YES,{No}_No가 반복됨
+            logger.info("splited count = ",FileCount)
+            file_list = glob.glob(split_path+'/*')
+            logger.info("file_list = ",file_list)
+            name = file_list[0].split('_')
+            logger.info(name)
+            if(name[1]=="YES"){
+
+            }else{
+
+            }
 
 
+
+            #압축파일 전송
+            folder_to_7z(tmp_path+"/slient_noise",tmp_path)
+            s3_key = "vocal/"+str(uuid)
+            s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
+            #silent_noise폴더 비우기
+            delete_files_in_folder(tmp_path+"/slient_noise")
+            #tmp폴더 비우기
+            delete_files_in_folder(tmp_path)
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
         return JsonResponse({"error":"error"},status = 411)
+    finally:
+        input_resource.close()
     
 def extract_mfcc(filepath):
     # MFCC 계산
