@@ -251,33 +251,14 @@ def inference(request):
                 model.to(device)
         logger.info('model done')
         
-        logger.info('loading wave source...')
-        with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = tmp_path) as temp_file:
-            framecount = input_resource.getnframes()
-            # framerate = input_resource.getframerate()
-            # logger.info(framecount)
-            # logger.info(framerate)
-            audio_bytes = io.BytesIO(input_resource.readframes(framecount))
-            temp_file.write(audio_bytes)
-            temp_file.flush()
-            temp_file.seek(0)
-            logger.info("왜 파일 생성이 안되니")
-            #여기까진 됨
-            # with audioread.audio_open(temp_file.name) as audio:
-            #     sr = audio.samplerate
-            #     audio_data = []
-            #     for frame in audio:
-            #         audio_data.append(frame)
-            #     X = librosa.core.audio.__audioread_load(audio_data,args.sr,mono=False)
-            
-            X, sr = librosa.load(
-                temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
-            
-            
-            if X.ndim == 1:
-            # mono to stereo
-                X = np.asarray([X, X])
-            audio_format2 = detect_file_type(temp_file.name)
+        X, sr = librosa.load(
+            tmp_path+"/"+str(uuid), sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+        
+        
+        if X.ndim == 1:
+        # mono to stereo
+            X = np.asarray([X, X])
+        audio_format2 = detect_file_type(temp_file.name)
         logger.info("file data, sr extract...")
         if(audio_format2=="Type Err"):
 
