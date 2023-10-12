@@ -219,9 +219,9 @@ def inference(request):
         uuid = serializer.validated_data['uuid']
     else:
         logger.info("serializer 오류 발생")
-    s3.download_file(bucket,fileKey,tmp_path+"/uuid")
+    s3.download_file(bucket,fileKey,tmp_path+"/"+str(uuid))
     try:
-        input_resource = wave.open(tmp_path+"/uuid",'rb')
+        input_resource = wave.open(tmp_path+"/"+str(uuid),'rb')
         args = easydict.EasyDict({
             "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
             "sr" : 44100,
@@ -251,9 +251,12 @@ def inference(request):
             temp_file.write(input_resource.readframes(input_resource.getnframes()))
             temp_file.flush()
             temp_file.seek(0)
+            
             X, sr = load_audio_file(temp_file.name, sr=args.sr)
             # X, sr = librosa.load(
             #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            logger.info("file data, sr extract done")
+            
             if X.ndim == 1:
             # mono to stereo
                 X = np.asarray([X, X])
