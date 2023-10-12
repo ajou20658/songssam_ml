@@ -239,7 +239,7 @@ def inference(request):
         
         logger.info('loading wave source...')
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = tmp_path) as temp_file:
-            temp_file.write(input_resource.read())
+            temp_file.write(input_resource.readframes(input_resource.getnframes()))
             temp_file.flush()
             temp_file.seek(0)
             X, sr = librosa.load(
