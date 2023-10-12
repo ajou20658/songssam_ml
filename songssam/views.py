@@ -22,6 +22,7 @@ from .lib import nets
 from .lib import spec_utils
 from .lib import utils
 
+import wave
 import magic
 import librosa
 import numpy as np
@@ -260,10 +261,10 @@ def inference(request):
             
             if(isUser != True):
                 logger.info('MR loading...')
-                wave = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
+                waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
                 logger.info('저장중...')
                 byte_io = BytesIO()
-                sf.write(byte_io,wave.T,sr,subtype = audio_format2,format='WAV')
+                sf.write(byte_io,waveT.T,sr,subtype = audio_format2,format='WAV')
                 byte_io.seek(0) #포인터 돌려주기
 
                 s3_key = "inst/"+str(uuid)
@@ -273,10 +274,10 @@ def inference(request):
 
             ##########################################################
             logger.info('보컬 loading...')
-            wave = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
+            waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
             logger.info('저장중...')
             output_file_path = str(uuid)+".wav"
-            sf.write(output_file_path,wave.T,sr,subtype = audio_format2,format='WAV')
+            sf.write(output_file_path,waveT.T,sr,subtype = audio_format2,format='WAV')
             split_path = tmp_path+"/silent_noise"
             FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
             ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
