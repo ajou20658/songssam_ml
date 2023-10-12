@@ -9,10 +9,8 @@ from pydub import AudioSegment
 import py7zr
 import logging
 import easydict
-import tempfile
 import os
 import glob
-import io
 
 from .serializers import SongSerializer
 from .lib import dataset
@@ -177,7 +175,7 @@ def extract_7z(file_path,extract_dir):
 def detect_file_type(file_path):
     mime = magic.Magic()
     file_type = mime.from_file(file_path)
-    logger.info("file type: ",file_type)
+    logger.info(file_type)
     if(file_type.__contains__("PCM, 16")):
         return "PCM_16"
     elif(file_type.__contains__("PCM_24")):
@@ -296,9 +294,9 @@ def inference(request):
         FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
         ##파일 {No}_YES,{No}_No가 반복됨
-        logger.info("splited count = ",FileCount)
+        logger.info(FileCount)
         file_list = glob.glob(split_path+'/*')
-        logger.info("file_list = ",file_list)
+        logger.info(file_list)
         name = file_list[0].split('_')
         logger.info(name)
         if(name[1]=="YES"):
