@@ -251,7 +251,7 @@ def inference(request):
         logger.info('model done')
         
         X, sr = librosa.load(
-            tmp_path+"/"+str(uuid), sr=args.sr, mono=False, dtype=np.float64, res_type='kaiser_fast')
+            tmp_path+"/"+str(uuid), sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
         
         if X.ndim == 1:
