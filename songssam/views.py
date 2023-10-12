@@ -22,6 +22,8 @@ from .lib import nets
 from .lib import spec_utils
 from .lib import utils
 
+import io
+import ffmpeg
 import wave
 import magic
 import librosa
@@ -255,21 +257,21 @@ def inference(request):
         
         logger.info('loading wave source...')
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=True,dir = tmp_path) as temp_file:
-            temp_file.write(input_resource.readframes(input_resource.getnframes()))
+            temp_file.write(io.BytesIO(input_resource.readframes(input_resource.getnframes())))
             temp_file.flush()
             temp_file.seek(0)
             logger.info("왜 파일 생성이 안되니")
             #여기까진 됨
-            with audioread.audio_open(temp_file.name) as audio:
-                sr = audio.samplerate
-                audio_data = []
-                for frame in audio:
-                    audio_data.append(frame)
-                X = librosa.core.audio.__audioread_load(audio_data,args.sr,mono=False)
+            # with audioread.audio_open(temp_file.name) as audio:
+            #     sr = audio.samplerate
+            #     audio_data = []
+            #     for frame in audio:
+            #         audio_data.append(frame)
+            #     X = librosa.core.audio.__audioread_load(audio_data,args.sr,mono=False)
             
-            # X, sr = librosa.load(
-            #     temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
-            #
+            X, sr = librosa.load(
+                temp_file.name, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            
             
             if X.ndim == 1:
             # mono to stereo
