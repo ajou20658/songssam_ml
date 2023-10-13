@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
 from pydub import AudioSegment
+from .f0_extractor.f0_extractor import process
 
 import py7zr
 import logging
@@ -209,7 +210,7 @@ def load_audio_file(file_path, target_sr=None):
 @api_view(['POST'])
 def inference(request):
     serializer = SongSerializer(data = request.data)
-    logger.info(serializer)
+    # logger.info(serializer)
     if serializer.is_valid():
         fileKey = serializer.validated_data['fileKey']
         isUser = serializer.validated_data['isUser']
@@ -251,12 +252,18 @@ def inference(request):
         logger.info('model done')
         
         X, sr = librosa.load(
-            tmp_path+"/"+str(uuid), sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
         
         if X.ndim == 1:
         # mono to stereo
             X = np.asarray([X, X])
+        if(np.isnan(X).any()):
+            logger.info("fucking nan")
+            return JsonResponse({"error":"fucking nan error"},status = 411)
+        if(np.isinf(X).any()):
+            logger.info("fucking nan")
+            return JsonResponse({"error":"fucking inf error"},status = 411)
         audio_format2 = detect_file_type(filename)
         logger.info("file data, sr extract...")
         if(audio_format2=="Type Err"):
@@ -268,10 +275,10 @@ def inference(request):
         sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
 
         y_spec, v_spec = sp.separate_tta(X_spec)
-
+        logger.info(y_spec.dtype)
         print('inverse stft of instruments...', end=' ')
         
-        if(isUser != True):
+        if(isUser!="true"):
             logger.info('MR loading...')
             waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
             logger.info('저장중...')
@@ -323,3 +330,8 @@ def inference(request):
         return JsonResponse({"error":"error"},status = 411)
     finally:
         input_resource.close()
+
+@csrf_exempt
+@api_view(['GET'])
+def f0_extractor(request):
+    process()
