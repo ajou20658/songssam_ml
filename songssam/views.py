@@ -292,7 +292,7 @@ def inference(request):
         waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
         logger.info('저장중...')
         output_file_path = str(uuid)+".wav"
-        sf.write(output_file_path,waveT.T,sr,subtype = audio_format2,format='WAV')
+        sf.write(output_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
         split_path = tmp_path+"/silent_noise"
         FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
