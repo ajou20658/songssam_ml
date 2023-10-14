@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
 from pydub import AudioSegment
+from pydub.silence import detect_silence
 
 import py7zr
 import logging
@@ -131,13 +132,13 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     audio = AudioSegment.from_file(input_audio_file)
 
     # 음성이 있는 구간과 없는 구간 감지
-    non_silent_ranges = audio.detect_silence(silence_thresh=-40, min_silence_len=5000, seek_step=1000)
-
+    silence_ranges = detect_silence(audio,min_silence_len=1000,silence_thresh=-16,seek_step=1)
     # 음성과 음성 없는 구간 번갈아가면서 저장
     segment_counter = 0
     is_silent_segment = False
 
-    for start, end in non_silent_ranges:
+    for start, end in silence_ranges:
+        print(f"silent range:: {start}ms - {end}ms")
         if is_silent_segment:
             segment = audio[start:end]
             output_file = f"{output_audio_dir}/{segment_counter}_YES.wav"
