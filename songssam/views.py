@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
 from pydub import AudioSegment
-from .f0_extractor.f0_extractor import process
 
 import py7zr
 import logging
@@ -177,7 +176,7 @@ def detect_file_type(file_path):
     mime = magic.Magic()
     file_type = mime.from_file(file_path)
     logger.info(file_type)
-    if(file_type.__contains__("PCM, 16")):
+    if(file_type.__contains__("PCM_16")):
         return "PCM_16"
     elif(file_type.__contains__("PCM_24")):
         return "PCM_24"
@@ -226,7 +225,7 @@ def inference(request):
     s3.download_file(bucket,fileKey,filename)
     try:
         
-        input_resource = wave.open(filename,'rb')
+        # input_resource = wave.open(filename,'rb')
         args = easydict.EasyDict({
             "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
             "sr" : 44100,
@@ -252,25 +251,21 @@ def inference(request):
         logger.info('model done')
         
         X, sr = librosa.load(
-            filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            filename, sr=args.sr, mono=False, dtype=np.float64, res_type='kaiser_fast')
         
         
         if X.ndim == 1:
         # mono to stereo
             X = np.asarray([X, X])
-        if(np.isnan(X).any()):
-            logger.info("fucking nan")
-            return JsonResponse({"error":"fucking nan error"},status = 411)
-        if(np.isinf(X).any()):
-            logger.info("fucking nan")
-            return JsonResponse({"error":"fucking inf error"},status = 411)
-        audio_format2 = detect_file_type(filename)
-        logger.info("file data, sr extract...")
-        if(audio_format2=="Type Err"):
-
-            return JsonResponse({"error":"wrong type error"},status = 411)
-        X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
         
+        audio_format2 = detect_file_type(filename)
+        logger.info(audio_format2)
+        logger.info("file data, sr extract...")
+        # if(audio_format2=="Type Err"):
+
+        #     return JsonResponse({"error":"wrong type error"},status = 411)
+        X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
+        logger.info(X_spec.dtype)
 
         sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
 
@@ -302,19 +297,24 @@ def inference(request):
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
         ##파일 {No}_YES,{No}_No가 반복됨
         logger.info(FileCount)
+        ##tmppath/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         file_list = glob.glob(split_path+'/*')
         logger.info(file_list)
+        
         name = file_list[0].split('_')
-        logger.info(name)
+        logger.info(name)##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
+
+
         if(name[1]=="YES"):
+            filenum=0
+            for i in range(FileCount):
+                tmp_file = file_list[i]
+                filenum = split_audio_slicing(filenum,tmp_file)
             logger.info("yes")
         else:
             logger.info("No")
 
         
-
-
-
         #압축파일 전송
         folder_to_7z(tmp_path+"/slient_noise",tmp_path)
         s3_key = "vocal/"+str(uuid)
@@ -328,10 +328,5 @@ def inference(request):
         error_message = str(e)
         logger.error(error_message)
         return JsonResponse({"error":"error"},status = 411)
-    finally:
-        input_resource.close()
-
-@csrf_exempt
-@api_view(['GET'])
-def f0_extractor(request):
-    process()
+    # finally:
+    #     input_resource.close()
