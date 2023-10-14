@@ -132,7 +132,7 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     audio = AudioSegment.from_file(input_audio_file)
 
     # 음성이 있는 구간과 없는 구간 감지
-    silence_ranges = detect_silence(audio,min_silence_len=1000,silence_thresh=-16,seek_step=1)
+    silence_ranges = detect_silence(audio,min_silence_len=5000,silence_thresh=-16,seek_step=1000)
     # 음성과 음성 없는 구간 번갈아가면서 저장
     segment_counter = 0
     is_silent_segment = False
