@@ -303,11 +303,12 @@ def inference(request):
         file_list = glob.glob(split_path+'/*')
         logger.info(file_list)
         
-        name = file_list[0].split('_')
-        logger.info(name)##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
+        name = file_list[0].split(split_path)
+        sname = name.split("_")
+        logger.info(sname)##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
 
 
-        if(name[1]=="YES"):
+        if(sname[1]=="YES"):
             filenum=0
             for i in range(FileCount):
                 tmp_file = file_list[i]
