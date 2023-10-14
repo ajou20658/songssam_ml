@@ -251,13 +251,13 @@ def inference(request):
         logger.info('model done')
         
         X, sr = librosa.load(
-            filename, sr=args.sr, mono=False, dtype=np.float64, res_type='kaiser_fast')
+            filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
         
         if X.ndim == 1:
         # mono to stereo
             X = np.asarray([X, X])
-        
+        logger.info(X.ndim)
         audio_format2 = detect_file_type(filename)
         logger.info(audio_format2)
         logger.info("file data, sr extract...")
@@ -270,6 +270,7 @@ def inference(request):
         sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
 
         y_spec, v_spec = sp.separate_tta(X_spec)
+        logger.info(y_spec.ndim)
         logger.info(y_spec.dtype)
         print('inverse stft of instruments...', end=' ')
         
@@ -278,7 +279,7 @@ def inference(request):
             waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
             logger.info('저장중...')
             byte_io = BytesIO()
-            sf.write(byte_io,waveT.T,sr,subtype = audio_format2,format='WAV')
+            sf.write(byte_io,waveT.T,sr,subtype = 'PCM_16',format='WAV')
             byte_io.seek(0) #포인터 돌려주기
 
             s3_key = "inst/"+str(uuid)
