@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from tqdm import tqdm
 from pydub import AudioSegment
-from pydub.silence import detect_silence
+from pydub.silence import detect_silence, detect_nonsilent
 
 import py7zr
 import logging
@@ -132,26 +132,22 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     audio = AudioSegment.from_file(input_audio_file)
 
     # 음성이 있는 구간과 없는 구간 감지
-    silence_ranges = detect_silence(audio,min_silence_len=5000,silence_thresh=-16,seek_step=1000)
-    # 음성과 음성 없는 구간 번갈아가면서 저장
-    segment_counter = 0
-    is_silent_segment = False
+    min_silence_len = 1000  # 최소 silence 길이 (ms)
+    silence_thresh = -32    # 모든 것이 이 값보다 큰 dBFS 위에 있다고 가정합니다.
 
-    for start, end in silence_ranges:
-        print(f"silent range:: {start}ms - {end}ms")
-        if is_silent_segment:
-            segment = audio[start:end]
-            output_file = f"{output_audio_dir}/{segment_counter}_YES.wav"
-            segment.export(output_file, format="wav")
-        else:
-            silent_start = start
-            silent_end = end
-            segment = audio[silent_start:silent_end]
-            output_file = f"{output_audio_dir}/{segment_counter}_NO.wav"
-            segment.export(output_file, format="wav")
-        is_silent_segment = not is_silent_segment
-        segment_counter += 1
-    return segment_counter
+    nonsilent_data = detect_nonsilent(audio, min_silence_len, silence_thresh)
+    silent_data = detect_silence(audio,min_silence_len,silence_thresh)
+    
+    all_data = nonsilent_data+silent_data
+    all_data.sort(key=lambda x: x[0])
+    
+    chunks = []
+    for start_i, end_i in all_data:
+        chunks.append(audio[start_i:end_i])
+
+    for i, chunk in enumerate(chunks):
+        chunk.export(f"chunk{i}.mp3", format="mp3")
+    return len(chunks)-1
 
 def delete_files_in_folder(folder_path):
     for filename in os.listdir(folder_path):
