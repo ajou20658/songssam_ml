@@ -132,8 +132,8 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     audio = AudioSegment.from_file(input_audio_file)
 
     # 음성이 있는 구간과 없는 구간 감지
-    min_silence_len = 1000  # 최소 silence 길이 (ms)
-    silence_thresh = -32    # 모든 것이 이 값보다 큰 dBFS 위에 있다고 가정합니다.
+    min_silence_len = 5000  # 최소 silence 길이 (ms)
+    silence_thresh = 0    # 모든 것이 이 값보다 큰 dBFS 위에 있다고 가정합니다.
 
     nonsilent_data = detect_nonsilent(audio, min_silence_len, silence_thresh)
     silent_data = detect_silence(audio,min_silence_len,silence_thresh)
@@ -146,7 +146,7 @@ def split_audio_silent(input_audio_file, output_audio_dir):
         chunks.append(audio[start_i:end_i])
 
     for i, chunk in enumerate(chunks):
-        chunk.export(f"chunk{i}.mp3", format="mp3")
+        chunk.export(output_audio_dir+f"chunk{i}.wav", format="wav")
     return len(chunks)-1
 
 def delete_files_in_folder(folder_path):
