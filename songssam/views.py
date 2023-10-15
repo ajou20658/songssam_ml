@@ -132,7 +132,7 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     audio = AudioSegment.from_file(input_audio_file)
 
     # 음성이 있는 구간과 없는 구간 감지
-    min_silence_len = 5000  # 최소 silence 길이 (ms)
+    min_silence_len = 2000  # 최소 silence 길이 (ms)
     silence_thresh = 0    # 모든 것이 이 값보다 큰 dBFS 위에 있다고 가정합니다.
 
     nonsilent_data = detect_nonsilent(audio, min_silence_len, silence_thresh)
@@ -290,7 +290,7 @@ def inference(request):
         logger.info('저장중...')
         output_file_path = tmp_path+"/"+str(uuid)+".wav"
         sf.write(output_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
-        split_path = tmp_path+"/silent_noise"
+        split_path = tmp_path+"/silent_noise/"
         FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
         ##파일 {No}_YES,{No}_No가 반복됨
