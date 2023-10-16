@@ -134,8 +134,9 @@ def split_audio_silent(input_audio_file, output_audio_dir):
     # 음성이 있는 구간과 없는 구간 감지
     min_silence_len = 2000  # 최소 silence 길이 (ms)
     silence_thresh = 0    # 모든 것이 이 값보다 큰 dBFS 위에 있다고 가정합니다.
-
+    logger.info("nonsilent_data extract")
     nonsilent_data = detect_nonsilent(audio, min_silence_len, silence_thresh)
+    logger.info("silent_data extract")
     silent_data = detect_silence(audio,min_silence_len,silence_thresh)
     
     all_data = nonsilent_data+silent_data
@@ -146,7 +147,10 @@ def split_audio_silent(input_audio_file, output_audio_dir):
         chunks.append(audio[start_i:end_i])
 
     for i, chunk in enumerate(chunks):
-        chunk.export(output_audio_dir+f"chunk{i}.wav", format="wav")
+        chunk.export(output_audio_dir+"/"+f"chunk{i}.wav", format="wav")
+        logger.info(output_audio_dir+"/"+f"chunk{i}.wav")
+    
+    logger.info("silent split complete")
     return len(chunks)-1
 
 def delete_files_in_folder(folder_path):
@@ -190,6 +194,7 @@ def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 �
         segment = audio[start_time:end_time]
         output_file_path = f"{output_audio_dir}/{filenum}_YES.wav"
         segment.export(output_file_path,format="wav")
+        logger.info(output_file_path)
         filenum += 1
     logger.info("split complete")
     return filenum
@@ -256,8 +261,8 @@ def inference(request):
             X = np.asarray([X, X])
         logger.info(X.ndim)
         audio_format2 = detect_file_type(filename)
-        logger.info(audio_format2)
-        logger.info("file data, sr extract...")
+        # logger.info(audio_format2)
+        # logger.info("file data, sr extract...")
         # if(audio_format2=="Type Err"):
 
         #     return JsonResponse({"error":"wrong type error"},status = 411)
@@ -274,11 +279,12 @@ def inference(request):
         if(isUser!="true"):
             logger.info('MR loading...')
             waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
-            logger.info('저장중...')
+            
             byte_io = BytesIO()
             sf.write(byte_io,waveT.T,sr,subtype = 'PCM_16',format='WAV')
             byte_io.seek(0) #포인터 돌려주기
-
+            logger.info(byte_io.name)
+            logger.info("위 경로에 MR 저장완료")
             s3_key = "inst/"+str(uuid)
             s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType = "audio/wav")
             
@@ -287,11 +293,13 @@ def inference(request):
         ##########################################################
         logger.info('보컬 loading...')
         waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
-        logger.info('저장중...')
         output_file_path = tmp_path+"/"+str(uuid)+".wav"
         sf.write(output_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
-        split_path = tmp_path+"/silent_noise/"
+        logger.info(byte_io.name)
+        logger.info("위 경로에 MR 저장완료")
+        split_path = tmp_path+"/silent_noise" # "/home/ubuntu/git/songssam_ml/songssam/tmp/silent_noise"
         FileCount = split_audio_silent(output_file_path,split_path)#음성 빈곳과 채워진 곳 분리
+        
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
         ##파일 {No}_YES,{No}_No가 반복됨
         logger.info(FileCount)
