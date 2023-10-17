@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='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')
 bucket = "songssam.site"
 
-tmp_path = "/home/ubuntu/git/songssam_ml/songssam/tmp"
+tmp_path = "/home/ubuntu/songssam_ml/songssam/tmp"
 
 
 class Separator(object):
@@ -179,6 +179,8 @@ def split_audio_silent(y,sr, output_audio_dir):
     end
     noisy_segments = []
     for segment in silent_segments:
+        if(segment == silent_segments[0]):
+            continue
         start=segment[0]
         noisy_segments.append((end,start)) # 이전의 end와 이후의 start == noisy한 구간
         end=segment[1]
@@ -275,7 +277,7 @@ def inference(request):
         
         # input_resource = wave.open(filename,'rb')
         args = easydict.EasyDict({
-            "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
+            "pretrained_model" : '/home/ubuntu/songssam_ml/songssam/models/baseline.pth',
             "sr" : 44100,
             "n_fft" : 2048,
             "hop_length" : 1024,
