@@ -33,8 +33,14 @@ import audioread
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='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')
 bucket = "songssam.site"
+<<<<<<< HEAD
 root = os.path.abspath('.')
 tmp_path = root+"/songssam/tmp"
+=======
+
+tmp_path = "/home/ubuntu/songssam_ml/songssam/tmp"
+
+>>>>>>> db6fdfefbecf21e881b1a8596b5d3fed9998056c
 
 class Separator(object):
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
@@ -276,7 +282,11 @@ def inference(request):
         
         # input_resource = wave.open(filename,'rb')
         args = easydict.EasyDict({
+<<<<<<< HEAD
             "pretrained_model" : root+'/songssam/models/baseline.pth',
+=======
+            "pretrained_model" : '/home/ubuntu/songssam_ml/songssam/models/baseline.pth',
+>>>>>>> db6fdfefbecf21e881b1a8596b5d3fed9998056c
             "sr" : 44100,
             "n_fft" : 2048,
             "hop_length" : 1024,
