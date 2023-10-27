@@ -33,9 +33,8 @@ import audioread
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='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')
 bucket = "songssam.site"
-
-tmp_path = "/home/ubuntu/git/songssam_ml/songssam/tmp"
-
+root = os.path.abspath('.')
+tmp_path = root+"/songssam/tmp"
 
 class Separator(object):
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
@@ -175,10 +174,12 @@ def split_audio_silent(y,sr, output_audio_dir):
         if duration >= n_seconds_threshold:
             long_silent_segments.append(segment)
     print(silent_segments)
-    start
-    end
+    start = 0
+    end=0
     noisy_segments = []
     for segment in silent_segments:
+        if(segment == silent_segments[0]):
+            continue
         start=segment[0]
         noisy_segments.append((end,start)) # 이전의 end와 이후의 start == noisy한 구간
         end=segment[1]
@@ -208,7 +209,7 @@ def delete_files_in_folder(folder_path):
         except Exception as e:
             print(f"Error deleting {file_path}: {e}")
 
-def folder_to_7z(folder_path,output_dir):
+def folder_to_7z(folder_path,output_dir): #output_dir/compressed.7z
     with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
         for filename in os.listdir(folder_path):
             archive.write(filename)
@@ -275,7 +276,7 @@ def inference(request):
         
         # input_resource = wave.open(filename,'rb')
         args = easydict.EasyDict({
-            "pretrained_model" : '/home/ubuntu/git/songssam_ml/songssam/models/baseline.pth',
+            "pretrained_model" : root+'/songssam/models/baseline.pth',
             "sr" : 44100,
             "n_fft" : 2048,
             "hop_length" : 1024,
@@ -283,7 +284,7 @@ def inference(request):
             "cropsize" : 256,
             "postprocess" : 'store_true'
         })
-        gpu = -1
+        gpu = 0
         
         print('loading model...', end=' ')
         device = torch.device('cpu')
@@ -307,7 +308,7 @@ def inference(request):
             X = np.asarray([X, X])
         logger.info(X.ndim)
         audio_format2 = detect_file_type(filename)
-        # logger.info(audio_format2)
+        logger.info(audio_format2)
         # logger.info("file data, sr extract...")
         # if(audio_format2=="Type Err"):
 
@@ -372,8 +373,10 @@ def inference(request):
         
         #압축파일 전송
         folder_to_7z(tmp_path+"/slient_noise",tmp_path)
+        compressed_file=tmp_path+"/compressed.7z"
         s3_key = "vocal/"+str(uuid)
-        s3.put_object(Body=byte_io.getvalue(),Bucket = "songssam.site",Key=s3_key,ContentType="application/x-7z-compressed")
+        s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
+        
         #silent_noise폴더 비우기
         delete_files_in_folder(tmp_path+"/slient_noise")
         #tmp폴더 비우기
