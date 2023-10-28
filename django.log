@@ -2240,3 +2240,85 @@ Watching for file changes with StatReloader
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+Not Found: /
+Internal Server Error: /songssam/post/
+Traceback (most recent call last):
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py", line 275, in inference
+    s3.download_file(bucket,fileKey,filename)
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\boto3\s3\inject.py", line 190, in download_file
+    return transfer.download_file(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\boto3\s3\transfer.py", line 326, in download_file
+    future.result()
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\futures.py", line 103, in result
+    return self._coordinator.result()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\futures.py", line 266, in result
+    raise self._exception
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\tasks.py", line 139, in __call__
+    return self._execute_main(kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\tasks.py", line 162, in _execute_main
+    return_value = self._main(**kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\download.py", line 642, in _main
+    fileobj.seek(offset)
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\utils.py", line 378, in seek
+    self._open_if_needed()
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\utils.py", line 361, in _open_if_needed
+    self._fileobj = self._open_function(self._filename, self._mode)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\±è¿ì¿µ\AppData\Local\Programs\Python\Python311\Lib\site-packages\s3transfer\utils.py", line 272, in open
+    return open(filename, mode)
+           ^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\ÆÄ¶õÇÐ±â\\django/tmp\\3_³ª¿¡°Ô ±×´ë¸¸ÀÌ_Å¾Çö.mp3.83216eDc'
+C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+[Errno 2] No such file or directory: 'C:\\Users\\±è¿ì¿µ\\Documents\\2023-2\\ÆÄ¶õÇÐ±â\\django/models/baseline.pth'
+Length Required: /songssam/post/
+C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+model done
+module 'soundfile' has no attribute 'SoundFileRuntimeError'
+Length Required: /songssam/post/
+C:\Users\±è¿ì¿µ\Documents\2023-2\ÆÄ¶õÇÐ±â\django\songssam\views.py changed, reloading.
+Watching for file changes with StatReloader
+model done
+module 'soundfile' has no attribute 'SoundFileRuntimeError'
+Length Required: /songssam/post/
+Watching for file changes with StatReloader
