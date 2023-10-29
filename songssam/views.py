@@ -195,7 +195,7 @@ def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 �
     for start_time in range(0,len(audio),segment_length_ms):
         end_time = start_time + segment_length_ms
         segment = audio[start_time:end_time]
-        output_file_path = f"{output_audio_dir}/{filenum}_YES.wav"
+        output_file_path = f"{output_audio_dir}/{filenum}.wav"
         segment.export(output_file_path,format="wav")
         logger.info(output_file_path)
         filenum += 1
@@ -497,28 +497,30 @@ def inference(request):
         y, sr = librosa.load(output_file_path)
         
         ####################################
-        FileCount = split_audio_silent(y,sr,tmp_path)#음성 빈곳과 채워진 곳 분리
+        split_audio_silent(y,sr,tmp_path)#채워진 곳만 분리
         
-        ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
-        ##파일 {No}_YES,{No}_No가 반복됨
-        logger.info(FileCount)
         ##tmp_path/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
         
         
-        logger.info("No")
+        
         filenum=0
-
-        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path)
+        if not os.path.exists(tmp_path+"/slice"):
+            os.makedirs(tmp_path+"/slice")
+        else:
+            logger.info("folder already exists")
+        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/slice")
+        logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
 
         
         #압축파일 전송
-        folder_to_7z(tmp_path,tmp_path)
-        #split_path : tmp/uuid/silent_noise
+        folder_to_7z(tmp_path+"/slice",tmp_path)
+        #split_path : tmp/uuid/slice
         #tmp_path : tmp/uuid
         logger.info("압축파일 생성완료")
+
         compressed_file=tmp_path+"/compressed.7z"
         s3_key = "vocal/"+str(uuid)
         s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
