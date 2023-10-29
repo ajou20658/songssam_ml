@@ -462,10 +462,10 @@ def inference(request):
     else:
         logger.info("serializer 오류 발생")
     
-    # if not os.path.exists(tmp_path+"/"+str(uuid)):
-    #     os.makedirs(tmp_path+"/"+str(uuid))
-    # else:
-    #     logger.info("folder already exists")
+    if not os.path.exists(tmp_path+"/"+str(uuid)):
+        os.makedirs(tmp_path+"/"+str(uuid))
+    else:
+        logger.info("folder already exists")
     tmp_path=tmp_path+"/"+str(uuid)
     filename=tmp_path+"/mp3"
     s3.download_file(bucket,fileKey,filename)
