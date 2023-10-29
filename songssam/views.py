@@ -201,7 +201,7 @@ def split_audio_silent(y,sr, output_audio_dir):
             sf.write(output_filename_quiet,segment_quiet,sr)
         if i%2==1:
             segment_noisy = y[start_time:end_time]
-            output_filename_noisy = output_audio_dir+"/"+f"{i}y_quiet.wav"
+            output_filename_noisy = output_audio_dir+"/"+f"{i}_quiet.wav"
             sf.write(output_filename_noisy,segment_noisy,sr)
     logger.info("파일 분리 저장 완료")
     return len(sorted_all_data)
@@ -561,7 +561,8 @@ def inference(request):
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
         file_list = glob.glob(split_path+'/*')
         logger.info(file_list)
-        name = file_list[0].split(split_path)
+        sorted_list = file_list.sort()
+        name = sorted_list[0].split(split_path)
         sname = name[1].split("_")
         logger.info(sname)##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
 
