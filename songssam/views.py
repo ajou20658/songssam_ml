@@ -141,73 +141,17 @@ def split_audio_silent(y,sr, output_audio_dir):
 
     # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
     threshold = np.mean(magnitude)  # 임계값 설정 (평균값 사용)
-    mask = magnitude < threshold
+    mask = magnitude > threshold
 
     # 마스크를 사용하여 조용한 부분 제거 (소리 있는 부분만 남김)
     D_filtered = D * mask
 
     # ISTFT 수행하여 분리된 음성 신호 얻기 (조용한 부분)
-    y_quiet = librosa.istft(D_filtered)
+    y_noisy = librosa.istft(D_filtered)
 
-    # 소리 있는 부분을 얻기 위해 조용한 부분을 뺀다.
-    y_noisy = y - y_quiet  # 소음 제거하지 않은 원본 음성에서 조용한 부분을 뺀다.
-    n_seconds_threshold = 5  # n초 이상 false인 구간을 찾기 위한 임계값 설정
-    mask_false_indices = np.where(y_noisy==False)[0]
+    sf.write("Fix_Vocal.wav",y_noisy,sr)
 
-    time_intervals = np.diff(mask_false_indices)/sr
 
-    silent_segments = []
-
-    start_idx = mask_false_indices[0]
-
-    for i in range(1,len(mask_false_indices)):
-        if time_intervals[i-1] >= n_seconds_threshold:
-            end_idx = mask_false_indices[i-1]
-            silent_segments.append((start_idx,end_idx))
-            start_idx = mask_false_indices[i]
-
-    
-    end_idx = mask_false_indices[-1]
-    # if(len(mask_false_indices)>0) and (time_intervals[-1]>=n_seconds_threshold):
-    #     silent_segments.append((start_idx, end_idx))
-    # long_silent_segments = []
-    # for segment in silent_segments:
-    #     start_time, end_time = segment
-    #     duration = end_time - start_time
-    #     if duration >= n_seconds_threshold:
-    #         long_silent_segments.append(segment)
-    # print(silent_segments)
-    noisy_segments = []
-    start = 0
-    for segment in silent_segments:
-        start = segment[0]
-        noisy_segments.append((end, start))
-        end = segment[1]
-
-    # 마지막 조용한 구간과 마지막 조용하지 않은 구간 처리
-    noisy_segments.append((end, -1))
-
-    # all_data = silent_segments+noisy_segments
-    all_data = noisy_segments
-    sorted_all_data = sorted(all_data,key=lambda x:x[0])
-    logger.info("파일 분리하여 저장")
-    for i in range(len(sorted_all_data)):
-        logger.info(i)
-        start_time = sorted_all_data[i][0]
-        end_time = sorted_all_data[i][1]
-        segment_quiet = y[start_time:end_time]
-        output_filename_quiet = output_audio_dir+"/"+f"{i}.wav"
-        sf.write(output_filename_quiet,segment_quiet,sr)
-        # if i%2==0: #silece
-        #     segment_quiet = y[start_time:end_time]
-        #     output_filename_quiet = output_audio_dir+"/"+f"{i}_noisy.wav"
-        #     sf.write(output_filename_quiet,segment_quiet,sr)
-        # if i%2==1:
-        #     segment_noisy = y[start_time:end_time]
-        #     output_filename_noisy = output_audio_dir+"/"+f"{i}_quiet.wav"
-        #     sf.write(output_filename_noisy,segment_noisy,sr)
-    logger.info("파일 분리 저장 완료")
-    return len(sorted_all_data)
 
 def delete_files_in_folder(folder_path):
     for root, dirs, files in os.walk(folder_path):
@@ -551,42 +495,21 @@ def inference(request):
         sf.write(output_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
         logger.info("위 경로에 MR 저장완료")
         y, sr = librosa.load(output_file_path)
-        split_path = tmp_path+"/noise" # "/home/ubuntu/git/songssam_ml/songssam/tmp/uuid/silent_noise"
-        #######tmp/uuid/silent_noise폴더 생성
-        if not os.path.exists(split_path):
-            os.makedirs(split_path)
-        else:
-            logger.info("folder already exists")
+        
         ####################################
-        FileCount = split_audio_silent(y,sr,split_path)#음성 빈곳과 채워진 곳 분리
+        FileCount = split_audio_silent(y,sr,tmp_path)#음성 빈곳과 채워진 곳 분리
         
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
         ##파일 {No}_YES,{No}_No가 반복됨
         logger.info(FileCount)
         ##tmp_path/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
-        file_list = glob.glob(split_path+'/*')
         
-        sorted_list = sorted(file_list)
-        logger.info(sorted_list)
-        # name = sorted_list[0].split(split_path)
-        # sname = name[1].split("_")
-        # logger.info()##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
-
-
-        # if(sname[0]=="/quite"):#quiet
-        #     logger.info("yes")
-        #     filenum=0
-        #     for i in range(FileCount):
-        #         tmp_file = file_list[i]
-        #         filenum = split_audio_slicing(filenum,tmp_file)
-        # else:
-            #noisy
+        
         logger.info("No")
         filenum=0
-        for i in range(FileCount):
-            tmp_file = file_list[i]
-            filenum = split_audio_slicing(filenum,tmp_file)
+
+        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path)
             
 
         
