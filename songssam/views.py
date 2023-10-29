@@ -219,7 +219,7 @@ def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
     with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
         for filename in os.listdir(folder_path):
             logger.info(filename)
-            archive.write(filename)
+            archive.write(folder_path+"/"+filename)
     logger.info("압축 완료")
 
 def extract_7z(file_path,extract_dir):
@@ -591,8 +591,9 @@ def inference(request):
         logger.info("압축파일 aws업로드 완료")
         #silent_noise폴더 비우기
         # delete_files_in_folder(tmp_path+"/slient_noise")
-        # #tmp폴더 비우기
+        logger.info("tmp폴더 비우기")
         delete_files_in_folder(tmp_path)
+        
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
         error_message = str(e)
