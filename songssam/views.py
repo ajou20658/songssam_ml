@@ -139,17 +139,26 @@ def split_audio_silent(y,sr, output_audio_dir):
     # STFT의 크기(에너지) 계산
     magnitude = np.abs(D)
 
-    # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
-    threshold = np.mean(magnitude)  # 임계값 설정 (평균값 사용)
-    mask = magnitude > threshold
+    # 에너지가 일정 임계값 이상인 프레임을 소리가 있는 부분으로 간주
+    threshold = 0.01  # 임계값 설정 (조절 가능)
+    mask = (magnitude > threshold)
 
-    # 마스크를 사용하여 조용한 부분 제거 (소리 있는 부분만 남김)
-    D_filtered = D * mask
+    # 소리가 있는 부분의 시작과 끝을 찾아내기
+    onsets = librosa.onset.onset_detect(onset_envelope=np.mean(mask, axis=0))
 
-    # ISTFT 수행하여 분리된 음성 신호 얻기 (조용한 부분)
-    y_noisy = librosa.istft(D_filtered)
+    # 소리가 있는 부분만 추출
+    y_noisy = np.zeros_like(y)  # 소리가 있는 부분만을 저장할 배열 초기화
+    for i in range(len(onsets) - 1):
+        start_sample = onsets[i]
+        end_sample = onsets[i + 1]
+        y_noisy[start_sample:end_sample] = y[start_sample:end_sample]
 
-    sf.write(output_audio_dir+"/Fix_Vocal.wav",y_noisy,sr)
+    # 마지막 소리가 있는 부분 처리
+    if len(onsets) > 0:
+        y_noisy[onsets[-1]:] = y[onsets[-1]:]
+
+    # 소리가 있는 부분만을 저장할 새로운 오디오 파일
+    librosa.output.write_wav(output_audio_dir+"/Fix_Vocal.wav", y_noisy, sr)
 
 
 
