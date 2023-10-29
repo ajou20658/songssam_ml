@@ -158,7 +158,7 @@ def split_audio_silent(y,sr, output_audio_dir):
         y_noisy[onsets[-1]:] = y[onsets[-1]:]
 
     # 소리가 있는 부분만을 저장할 새로운 오디오 파일
-    librosa.output.write_wav(output_audio_dir+"/Fix_Vocal.wav", y_noisy, sr)
+    sf.write(output_audio_dir+"/Fix_Vocal.wav", y_noisy, sr)
 
 
 
