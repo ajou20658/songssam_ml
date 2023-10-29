@@ -149,7 +149,7 @@ def split_audio_silent(y,sr, output_audio_dir):
     # ISTFT 수행하여 분리된 음성 신호 얻기 (조용한 부분)
     y_noisy = librosa.istft(D_filtered)
 
-    sf.write("Fix_Vocal.wav",y_noisy,sr)
+    sf.write(output_audio_dir+"/Fix_Vocal.wav",y_noisy,sr)
 
 
 
