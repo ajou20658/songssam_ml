@@ -542,7 +542,13 @@ def inference(request):
         sf.write(output_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
         logger.info("위 경로에 MR 저장완료")
         y, sr = librosa.load(output_file_path)
-        split_path = tmp_path+"/silent_noise" # "/home/ubuntu/git/songssam_ml/songssam/tmp/silent_noise"
+        split_path = tmp_path+"/silent_noise" # "/home/ubuntu/git/songssam_ml/songssam/tmp/uuid/silent_noise"
+        #######tmp/uuid/silent_noise폴더 생성
+        if not os.path.exists(tmp_path+"/"+str(uuid)):
+            os.makedirs(tmp_path+"/"+str(uuid))
+        else:
+            logger.info("folder already exists")
+        ####################################
         FileCount = split_audio_silent(y,sr,split_path)#음성 빈곳과 채워진 곳 분리
         
         ##음성 빈 곳은 두고, 채워진 곳은 10초씩 분리하기, 파일이름 어떻게 해야되지
