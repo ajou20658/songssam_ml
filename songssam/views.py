@@ -150,6 +150,7 @@ def split_audio_silent(y,sr, output_audio_dir):
     y_noisy = librosa.istft(D_filtered)
 
     sf.write(output_audio_dir+"/Fix_Vocal.wav",y_noisy,sr)
+    return threshold
 
 
 
@@ -497,7 +498,7 @@ def inference(request):
         y, sr = librosa.load(output_file_path)
         
         ####################################
-        split_audio_silent(y,sr,tmp_path)#채워진 곳만 분리
+        threshold = split_audio_silent(y,sr,tmp_path)#채워진 곳만 분리
         
         ##tmp_path/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
@@ -513,7 +514,7 @@ def inference(request):
         logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
-        filter(tmp_path+"/slice")
+        filter(tmp_path+"/slice",threshold)
         
         #압축파일 전송
         folder_to_7z(tmp_path+"/slice",tmp_path)
@@ -538,7 +539,7 @@ def inference(request):
     # finally:
     #     input_resource.close()
 
-def filter(filepath):
+def filter(filepath,threshold):
     for root, dirs, files in os.walk(filepath):
         for filename in files:
             file_path = os.path.join(root, filename)
@@ -550,8 +551,8 @@ def filter(filepath):
                 magnitude = np.abs(D)
 
                 # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
-                threshold = np.mean(magnitude)  # 임계값 설정 (평균값 사용)
-                if os.path.isfile(file_path) & threshold < 1 :
+                np.mean(magnitude)  # 임계값 설정 (평균값 사용)
+                if np.mean(magnitude) < threshold :
                     os.remove(file_path)
                     print(f"Deleted: {file_path}")
             except Exception as e:
