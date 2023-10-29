@@ -176,7 +176,7 @@ def split_audio_silent(y,sr, output_audio_dir):
         duration = end_time - start_time
         if duration >= n_seconds_threshold:
             long_silent_segments.append(segment)
-    print(silent_segments)
+    # print(silent_segments)
     start = 0
     end=0
     noisy_segments = []
@@ -190,7 +190,9 @@ def split_audio_silent(y,sr, output_audio_dir):
     noisy_segments.append((end,-1))
     all_data = silent_segments+noisy_segments
     sorted_all_data = sorted(all_data,key=lambda x:x[0])
+    logger.info("파일 분리하여 저장")
     for i in range(len(sorted_all_data)):
+        logger.info(i)
         start_time = sorted_all_data[i][0]
         end_time = sorted_all_data[i][1]
         if i%2==0: #silece
@@ -201,6 +203,7 @@ def split_audio_silent(y,sr, output_audio_dir):
             segment_noisy = y[start_time:end_time]
             output_filename_noisy = output_audio_dir+"/"+f"{i}y_quiet.wav"
             sf.write(output_filename_noisy,segment_noisy,sr)
+    logger.info("파일 분리 저장 완료")
     return len(sorted_all_data)
 
 def delete_files_in_folder(folder_path):
@@ -212,7 +215,7 @@ def delete_files_in_folder(folder_path):
         except Exception as e:
             print(f"Error deleting {file_path}: {e}")
 
-def folder_to_7z(folder_path,output_dir): #output_dir/compressed.7z
+def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
     with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
         for filename in os.listdir(folder_path):
             archive.write(filename)
@@ -544,8 +547,8 @@ def inference(request):
         y, sr = librosa.load(output_file_path)
         split_path = tmp_path+"/silent_noise" # "/home/ubuntu/git/songssam_ml/songssam/tmp/uuid/silent_noise"
         #######tmp/uuid/silent_noise폴더 생성
-        if not os.path.exists(tmp_path+"/"+str(uuid)):
-            os.makedirs(tmp_path+"/"+str(uuid))
+        if not os.path.exists(split_path):
+            os.makedirs(split_path)
         else:
             logger.info("folder already exists")
         ####################################
@@ -575,14 +578,17 @@ def inference(request):
 
         
         #압축파일 전송
-        folder_to_7z(tmp_path+"/slient_noise",tmp_path)
+        folder_to_7z(split_path,tmp_path)
+        #split_path : tmp/uuid/silent_noise
+        #tmp_path : tmp/uuid
+        logger.info("압축파일 생성완료")
         compressed_file=tmp_path+"/compressed.7z"
         s3_key = "vocal/"+str(uuid)
         s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
-        
+        logger.info("압축파일 aws업로드 완료")
         #silent_noise폴더 비우기
-        delete_files_in_folder(tmp_path+"/slient_noise")
-        #tmp폴더 비우기
+        # delete_files_in_folder(tmp_path+"/slient_noise")
+        # #tmp폴더 비우기
         delete_files_in_folder(tmp_path)
         return JsonResponse({"message":"Success"},status=200)
     except Exception as e:
