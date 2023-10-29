@@ -37,8 +37,7 @@ import audioread
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='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')
 bucket = "songssam.site"
-root = os.path.abspath('.')
-tmp_path = root+"/songssam/tmp"
+
 
 class Separator(object):
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
@@ -454,6 +453,8 @@ def start_F0_Extractor(train_path) :
 @api_view(['POST'])
 def inference(request):
     serializer = SongSerializer(data = request.data)
+    root = os.path.abspath('.')
+    tmp_path = root+"/songssam/tmp"
     # logger.info(serializer)
     if serializer.is_valid():
         fileKey = serializer.validated_data['fileKey']
