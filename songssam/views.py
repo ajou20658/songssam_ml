@@ -218,6 +218,7 @@ def delete_files_in_folder(folder_path):
 def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
     with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
         for filename in os.listdir(folder_path):
+            logger.info(filename)
             archive.write(filename)
     logger.info("압축 완료")
 
@@ -560,8 +561,9 @@ def inference(request):
         ##tmp_path/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
         file_list = glob.glob(split_path+'/*')
-        logger.info(file_list)
-        sorted_list = file_list.sort()
+        
+        sorted_list = sorted(file_list)
+        logger.info(sorted_list)
         name = sorted_list[0].split(split_path)
         sname = name[1].split("_")
         logger.info(sname)##첫번째 파일의 이름을 _ 기준으로 분리하였을때 Yes인지 No인지 확인
