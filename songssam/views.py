@@ -207,14 +207,15 @@ def split_audio_silent(y,sr, output_audio_dir):
     return len(sorted_all_data)
 
 def delete_files_in_folder(folder_path):
-    for filename in os.listdir(folder_path):
-        file_path = folder_path+"/"+filename
-        logger.info(file_path)
-        try:
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-        except Exception as e:
-            print(f"Error deleting {file_path}: {e}")
+    for root, dirs, files in os.walk(folder_path):
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    print(f"Deleted: {file_path}")
+            except Exception as e:
+                print(f"Error deleting {file_path}: {e}")
 
 def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
     with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
