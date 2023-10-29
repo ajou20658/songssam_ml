@@ -510,11 +510,12 @@ def inference(request):
         filenum=0
 
         filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path)
-            
+        os.remove(output_file_path)
+        os.remove(tmp_path+"/Fix_Vocal.wav")
 
         
         #압축파일 전송
-        folder_to_7z(split_path,tmp_path)
+        folder_to_7z(tmp_path,tmp_path)
         #split_path : tmp/uuid/silent_noise
         #tmp_path : tmp/uuid
         logger.info("압축파일 생성완료")
