@@ -353,7 +353,7 @@ def load_config(path_config):
     # print(args)
     return args
 def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
-    path_srcdir  = os.path.join(path, 'audio') #tmp/uuid/slice/audio
+    path_srcdir  = os.path.join(path, 'rename_uuid') #tmp/uuid/slice/audio
     path_f0dir  = os.path.join(path, 'f0') #tmp/uuid/slice/f0
     
     # list files
@@ -549,7 +549,7 @@ def inference(request):
         logger.info("vocal압축파일 aws업로드 완료")
         folder_to_7z(tmp_path+"/f0")
         compressed_file=tmp_path+"/compressed.7z"
-        s3_key = "vocal/"+str(uuid)
+        s3_key = "spect/"+str(uuid)
         s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("f0압축파일 aws업로드 완료")
         #silent_noise폴더 비우기
@@ -584,7 +584,7 @@ def filter(filepath,threshold,rename_uuid):
                     print(f"Deleted: {file_path}")
                 else:
                     filenum=filenum+1
-                    os.rename(file_path,f"rename_uuid{filenum}".wav)
+                    os.rename(file_path,root+f"/rename_uuid/{filenum}")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
     
