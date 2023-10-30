@@ -394,9 +394,8 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
         process(file)
     
 def start_F0_Extractor(train_path) : #tmp/uuid/slice/아래의 파일들을 탐색
-    _, sample_rate = librosa.load(train_path, sr=None)
-    hop_size = 512 * sample_rate / 44100
-    
+    sample_rate = 44100
+    hop_size = 512
     F0_Extractor = F0_Extractor(
                             'crepe', 
                             44100, 
