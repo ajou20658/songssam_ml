@@ -386,7 +386,7 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
             os.makedirs(os.path.dirname(path_f0file), exist_ok=True)
             np.save(path_f0file, f0)
         else:
-            print('\n[Error] F0 extraction failed: ' + path_srcfile)
+            logger.info('\n[Error] F0 extraction failed: ' + path_srcfile)
     print('Preprocess the audio clips in :', path_srcdir)
     
     #
