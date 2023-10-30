@@ -586,7 +586,7 @@ def filter(filepath,threshold,rename_uuid):
                     print(f"Deleted: {file_path}")
                 else:
                     filenum=filenum+1
-                    os.rename(file_path,filepath+f"/rename_uuid/{filenum}")
+                    os.rename(file_path,filepath+f"/audio/{filenum}")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
     
