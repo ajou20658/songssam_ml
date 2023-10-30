@@ -166,7 +166,7 @@ def delete_files_in_folder(folder_path):
                 print(f"Error deleting {file_path}: {e}")
 
 def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
-    with py7zr.SevenZipFile(output_dir+'/compressed.7z','w') as archive:
+    with py7zr.SevenZipFile(output_dir,'w') as archive:
         for filename in os.listdir(folder_path):
             logger.info(filename)
             archive.write(folder_path+"/"+filename, filename)
@@ -521,9 +521,9 @@ def inference(request):
         logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
-        filter(tmp_path+"/audio",threshold,uuid)
-        if not os.path.exists(tmp_path+"/f0"):
-            os.makedirs(tmp_path+"/f0")
+        filter(tmp_path,threshold,uuid)
+        if not os.path.exists(tmp_path+"/rename_uuid"):
+            os.makedirs(tmp_path+"/rename_uuid")
         else:
             logger.info("folder already exists")
 
@@ -535,22 +535,23 @@ def inference(request):
         #         os.remove(file_path)
         #
         start_F0_Extractor(tmp_path)
-
+        compressed_vocal_file=tmp_path+"/compressed.7z"
         #압축파일 생성
-        folder_to_7z(tmp_path+"/audio",tmp_path)
+        folder_to_7z(tmp_path+"/audio",compressed_vocal_file)
             #split_path : tmp/uuid/slice
             #tmp_path : tmp/uuid
         logger.info("압축파일 생성완료")
 
         # 압축파일 전송
-        compressed_file=tmp_path+"/compressed.7z"
+        
         s3_key = "vocal/"+str(uuid)
-        s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
+        s3.upload_file(compressed_vocal_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("vocal압축파일 aws업로드 완료")
-        folder_to_7z(tmp_path+"/f0")
-        compressed_file=tmp_path+"/compressed.7z"
+        compressed_f0_file=tmp_path+"/compressed_f0.7z"
+        folder_to_7z(tmp_path+"/f0",tmp_path)
+        
         s3_key = "spect/"+str(uuid)
-        s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
+        s3.upload_file(compressed_f0_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("f0압축파일 aws업로드 완료")
         #silent_noise폴더 비우기
         # delete_files_in_folder(tmp_path+"/slient_noise")
@@ -566,7 +567,7 @@ def inference(request):
     #     input_resource.close()
 
 def filter(filepath,threshold,rename_uuid):
-    for root, dirs, files in os.walk(filepath):
+    for root, dirs, files in os.walk(filepath+"/audio"):
         filenum=0
         for filename in files:
             file_path = os.path.join(root, filename)
@@ -584,7 +585,7 @@ def filter(filepath,threshold,rename_uuid):
                     print(f"Deleted: {file_path}")
                 else:
                     filenum=filenum+1
-                    os.rename(file_path,root+f"/rename_uuid/{filenum}")
+                    os.rename(file_path,filepath+f"/rename_uuid/{filenum}")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
     
