@@ -165,12 +165,12 @@ def delete_files_in_folder(folder_path):
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
 
-def folder_to_7z(folder_path,output_dir): #tmp/uuid/compressed.7z
+def folder_to_7z(folder_path,output_dir): #to output_dir
     with py7zr.SevenZipFile(output_dir,'w') as archive:
         for filename in os.listdir(folder_path):
-            logger.info(filename)
+            logger.info("이 파일을 압축"+folder_path+"/"+filename)
             archive.write(folder_path+"/"+filename, filename)
-    logger.info("압축 완료")
+    logger.info("압축 완료 : "+output_dir)
 
 def extract_7z(file_path,extract_dir):
     with py7zr.SevenZipFile(file_path+'/compressed.7z','r') as archive:
@@ -353,8 +353,8 @@ def load_config(path_config):
     # print(args)
     return args
 def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
-    path_srcdir  = os.path.join(path, 'rename_uuid') #tmp/uuid/slice/audio
-    path_f0dir  = os.path.join(path, 'f0') #tmp/uuid/slice/f0
+    path_srcdir  = os.path.join(path, 'audio') #tmp/uuid/audio
+    path_f0dir  = os.path.join(path, 'f0') #tmp/uuid/f0
     
     # list files
     filelist =  traverse_dir(
@@ -507,8 +507,8 @@ def inference(request):
         
         
         filenum=0
-        if not os.path.exists(tmp_path+"/audio"):
-            os.makedirs(tmp_path+"/audio")
+        if not os.path.exists(tmp_path+"/raw"):
+            os.makedirs(tmp_path+"/raw")
         else:
             logger.info("folder already exists")
         if not os.path.exists(tmp_path+"/f0"):
@@ -517,12 +517,12 @@ def inference(request):
             logger.info("folder already exists")
 
         
-        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/audio")
+        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/raw")
         logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
-        if not os.path.exists(tmp_path+"/rename_uuid"):
-            os.makedirs(tmp_path+"/rename_uuid")
+        if not os.path.exists(tmp_path+"/audio"):
+            os.makedirs(tmp_path+"/audio")
         else:
             logger.info("folder already exists")
         filter(tmp_path,threshold,uuid)
@@ -535,8 +535,8 @@ def inference(request):
         #         start_F0_Extractor(file_path)
         #         os.remove(file_path)
         #
-        start_F0_Extractor(tmp_path+"/rename_uuid")
-        compressed_vocal_file=tmp_path+"/compressed.7z"
+        start_F0_Extractor(tmp_path) #tmp/uuid
+        compressed_vocal_file=tmp_path+"/compressed.7z" #/tmp/uuid/compressed.7z
         #압축파일 생성
         folder_to_7z(tmp_path+"/audio",compressed_vocal_file)
             #split_path : tmp/uuid/slice
@@ -568,7 +568,7 @@ def inference(request):
     #     input_resource.close()
 
 def filter(filepath,threshold,rename_uuid):
-    for root, dirs, files in os.walk(filepath+"/audio"):
+    for root, dirs, files in os.walk(filepath+"/raw"):
         filenum=0
         for filename in files:
             file_path = os.path.join(root, filename)
