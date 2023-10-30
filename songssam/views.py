@@ -548,7 +548,7 @@ def inference(request):
         s3.upload_file(compressed_vocal_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("vocal압축파일 aws업로드 완료")
         compressed_f0_file=tmp_path+"/compressed_f0.7z"
-        folder_to_7z(tmp_path+"/f0",tmp_path)
+        folder_to_7z(tmp_path+"/f0",compressed_f0_file)
         
         s3_key = "spect/"+str(uuid)
         s3.upload_file(compressed_f0_file,Bucket = "songssam.site",Key=s3_key)
