@@ -370,6 +370,7 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
         path_srcfile = os.path.join(path_srcdir, file)
         #tmp/uuid/audio/파일이름.wav
         path_f0file = os.path.join(path_f0dir, binfile)
+        logger.info("이곳에 저장 : "+path_f0file)
         # tmp/uuid/f0/파일이름.npy
         # load audio
         audio, _ = librosa.load(path_srcfile, sr=sample_rate)
