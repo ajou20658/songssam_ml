@@ -355,7 +355,8 @@ def load_config(path_config):
 def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
     path_srcdir  = os.path.join(path, 'audio') #tmp/uuid/audio
     path_f0dir  = os.path.join(path, 'f0') #tmp/uuid/f0
-    
+    logger.info(path_srcdir)
+    logger.info(path_f0dir)
     # list files
     filelist =  traverse_dir(
         path_srcdir,
@@ -364,7 +365,7 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
         is_sort=True,
         is_ext=True)
     #tmp/uuid/slice/* 파일 이름들
-    
+    logger.info(filelist)
     def process(file):
         binfile = file+'.npy'
         path_srcfile = os.path.join(path_srcdir, file)
