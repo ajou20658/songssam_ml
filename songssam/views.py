@@ -140,7 +140,7 @@ def split_audio_silent(y,sr, output_audio_dir):
     magnitude = np.abs(D)
 
     # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
-    threshold = np.mean(magnitude)  # 임계값 설정 (평균값 사용)
+    threshold = np.mean(magnitude)*0.3  # 임계값 설정 (평균값 사용)
     mask = magnitude > threshold
 
     # 마스크를 사용하여 조용한 부분 제거 (소리 있는 부분만 남김)
@@ -289,7 +289,7 @@ def traverse_dir(
     if is_sort:
         file_list.sort()
     return file_list
-
+CREPE_RESAMPLE_KERNEL={}
 class F0_Extractor:
     def __init__(self, f0_extractor = 'crepe', sample_rate = 44100, hop_size = 512, f0_min = 65, f0_max = 800):
         
@@ -353,8 +353,8 @@ def load_config(path_config):
     # print(args)
     return args
 def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
-    path_srcdir  = os.path.join(path, 'audio')
-    path_f0dir  = os.path.join(path, 'f0')
+    path_srcdir  = os.path.join(path, 'audio') #tmp/uuid/slice/audio
+    path_f0dir  = os.path.join(path, 'f0') #tmp/uuid/slice/f0
     
     # list files
     filelist =  traverse_dir(
@@ -363,12 +363,14 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
         is_pure=True,
         is_sort=True,
         is_ext=True)
+    #tmp/uuid/slice/* 파일 이름들
     
     def process(file):
         binfile = file+'.npy'
         path_srcfile = os.path.join(path_srcdir, file)
+        #tmp/uuid/audio/파일이름.wav
         path_f0file = os.path.join(path_f0dir, binfile)
-        
+        # tmp/uuid/f0/파일이름.npy
         # load audio
         audio, _ = librosa.load(path_srcfile, sr=sample_rate)
         if len(audio.shape) > 1:
@@ -391,7 +393,7 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
     for file in tqdm(filelist, total=len(filelist)):
         process(file)
     
-def start_F0_Extractor(train_path) :
+def start_F0_Extractor(train_path) : #tmp/uuid/slice/아래의 파일들을 탐색
     _, sample_rate = librosa.load(train_path, sr=None)
     hop_size = 512 * sample_rate / 44100
     
@@ -506,26 +508,51 @@ def inference(request):
         
         
         filenum=0
-        if not os.path.exists(tmp_path+"/slice"):
-            os.makedirs(tmp_path+"/slice")
+        if not os.path.exists(tmp_path+"/audio"):
+            os.makedirs(tmp_path+"/audio")
         else:
             logger.info("folder already exists")
-        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/slice")
+        if not os.path.exists(tmp_path+"/f0"):
+            os.makedirs(tmp_path+"/f0")
+        else:
+            logger.info("folder already exists")
+
+        
+        filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/audio")
         logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
-        filter(tmp_path+"/slice",threshold)
-        
-        #압축파일 전송
-        folder_to_7z(tmp_path+"/slice",tmp_path)
-        #split_path : tmp/uuid/slice
-        #tmp_path : tmp/uuid
+        filter(tmp_path+"/audio",threshold,uuid)
+        if not os.path.exists(tmp_path+"/f0"):
+            os.makedirs(tmp_path+"/f0")
+        else:
+            logger.info("folder already exists")
+
+        #f0_extractor시작    
+        # for root,_,files in os.walk(tmp_path+"/audio"):
+        #     for file in files:
+        #         file_path = os.path.join(root,file)
+        #         start_F0_Extractor(file_path)
+        #         os.remove(file_path)
+        #
+        start_F0_Extractor(tmp_path)
+
+        #압축파일 생성
+        folder_to_7z(tmp_path+"/audio",tmp_path)
+            #split_path : tmp/uuid/slice
+            #tmp_path : tmp/uuid
         logger.info("압축파일 생성완료")
 
+        # 압축파일 전송
         compressed_file=tmp_path+"/compressed.7z"
         s3_key = "vocal/"+str(uuid)
         s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
-        logger.info("압축파일 aws업로드 완료")
+        logger.info("vocal압축파일 aws업로드 완료")
+        folder_to_7z(tmp_path+"/f0")
+        compressed_file=tmp_path+"/compressed.7z"
+        s3_key = "vocal/"+str(uuid)
+        s3.upload_file(compressed_file,Bucket = "songssam.site",Key=s3_key)
+        logger.info("f0압축파일 aws업로드 완료")
         #silent_noise폴더 비우기
         # delete_files_in_folder(tmp_path+"/slient_noise")
         logger.info("tmp폴더 비우기")
@@ -539,8 +566,9 @@ def inference(request):
     # finally:
     #     input_resource.close()
 
-def filter(filepath,threshold):
+def filter(filepath,threshold,rename_uuid):
     for root, dirs, files in os.walk(filepath):
+        filenum=0
         for filename in files:
             file_path = os.path.join(root, filename)
             try:
@@ -555,6 +583,9 @@ def filter(filepath,threshold):
                 if np.mean(magnitude) < threshold :
                     os.remove(file_path)
                     print(f"Deleted: {file_path}")
+                else:
+                    filenum=filenum+1
+                    os.rename(file_path,f"rename_uuid{filenum}".wav)
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
     
