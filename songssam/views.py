@@ -521,11 +521,12 @@ def inference(request):
         logger.info(filenum)
         os.remove(output_file_path)
         os.remove(tmp_path+"/Fix_Vocal.wav")
-        filter(tmp_path,threshold,uuid)
         if not os.path.exists(tmp_path+"/rename_uuid"):
             os.makedirs(tmp_path+"/rename_uuid")
         else:
             logger.info("folder already exists")
+        filter(tmp_path,threshold,uuid)
+        
 
         #f0_extractor시작    
         # for root,_,files in os.walk(tmp_path+"/audio"):
@@ -534,7 +535,7 @@ def inference(request):
         #         start_F0_Extractor(file_path)
         #         os.remove(file_path)
         #
-        start_F0_Extractor(tmp_path)
+        start_F0_Extractor(tmp_path+"/rename_uuid")
         compressed_vocal_file=tmp_path+"/compressed.7z"
         #압축파일 생성
         folder_to_7z(tmp_path+"/audio",compressed_vocal_file)
