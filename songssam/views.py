@@ -547,7 +547,7 @@ def inference(request):
         logger.info("vocal압축파일 aws업로드 완료")
         compressed_f0_file=tmp_path+"/compressed_f0.7z"
         folder_to_7z(tmp_path+"/f0",compressed_f0_file)
-        
+        f0_print(tmp_path+"/f0")
         s3_key = "spect/"+str(uuid)
         s3.upload_file(compressed_f0_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("f0압축파일 aws업로드 완료")
@@ -563,7 +563,13 @@ def inference(request):
         return JsonResponse({"error":"error"},status = 411)
     # finally:
     #     input_resource.close()
-
+def f0_print(filepath):
+    for root,dirs,files in os.awlk(filepath):
+        for filename in files:
+            f0 = np.load(root+"/"+filename)
+            min_f0 = np.min(f0)
+            max_f0 = np.max(f0)
+            logger.info(f"high pitch : {max_f0}, low pitch : {min_f0}")
 def filter(filepath,threshold,rename_uuid):
     for root, dirs, files in os.walk(filepath+"/raw"):
         filenum=0
@@ -583,7 +589,7 @@ def filter(filepath,threshold,rename_uuid):
                     print(f"Deleted: {file_path}")
                 else:
                     filenum=filenum+1
-                    os.rename(file_path,filepath+f"/audio/{filenum}".wav)
+                    os.rename(file_path,filepath+f"/audio/{filenum}.wav")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
     
