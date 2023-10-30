@@ -396,13 +396,13 @@ def preprocess(path,f0_extractor,sample_rate,hop_size,device,extensions):
 def start_F0_Extractor(train_path) : #tmp/uuid/slice/아래의 파일들을 탐색
     sample_rate = 44100
     hop_size = 512
-    F0_Extractor = F0_Extractor(
+    F0_Extractor2 = F0_Extractor(
                             'crepe', 
                             44100, 
                             512, 
                             65, 
                             800)
-    preprocess(train_path,F0_Extractor,sample_rate,hop_size,device='cuda',extensions=['wav'])
+    preprocess(train_path,F0_Extractor2,sample_rate,hop_size,device='cuda',extensions=['wav'])
 
 @csrf_exempt
 @api_view(['POST'])
