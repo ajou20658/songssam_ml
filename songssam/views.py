@@ -152,8 +152,6 @@ def split_audio_silent(y,sr, output_audio_dir):
     sf.write(output_audio_dir+"/Fix_Vocal.wav",y_noisy,sr)
     return threshold
 
-
-
 def delete_files_in_folder(folder_path):
     for root, dirs, files in os.walk(folder_path):
         for filename in files:
@@ -564,7 +562,7 @@ def inference(request):
     # finally:
     #     input_resource.close()
 def f0_print(filepath):
-    for root,dirs,files in os.awlk(filepath):
+    for root,dirs,files in os.walk(filepath):
         for filename in files:
             f0 = np.load(root+"/"+filename)
             min_f0 = np.min(f0)
@@ -592,4 +590,8 @@ def filter(filepath,threshold,rename_uuid):
                     os.rename(file_path,filepath+f"/audio/{filenum}.wav")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
-    
+
+@csrf_exempt
+@api_view(['GET'])
+def opencheck():
+    return JsonResponse({"message":"Open"},status=200)
