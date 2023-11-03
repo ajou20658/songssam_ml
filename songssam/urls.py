@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import inference
+from .views import opencheck
 
 urlpatterns = [
-    path('post/',inference),
+    path('splitter/',inference),
+    path('opencheck/',opencheck)
 ]
