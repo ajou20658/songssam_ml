@@ -134,7 +134,7 @@ def split_audio_silent(y,sr, output_audio_dir):
     magnitude = np.abs(D)
 
     # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
-    threshold = np.mean(magnitude)*0.3  # 임계값 설정 (평균값 사용)
+    threshold = np.mean(magnitude)*0.1  # 임계값 설정 (평균값 사용)
     mask = magnitude > threshold
 
     # 마스크를 사용하여 조용한 부분 제거 (소리 있는 부분만 남김)
@@ -336,7 +336,7 @@ def inference(request):
         _, centroids = extract_centroid(f0)
         data = f0_feature(centroids)
         df_json = data.to_json(orient='records')
-        
+        compressed_vocal_file=tmp_path+"/compressed.7z" #/tmp/uuid/compressed.7z
         #압축파일 생성
         folder_to_7z(tmp_path+"/audio",compressed_vocal_file)
             #split_path : tmp/uuid/slice
@@ -344,7 +344,7 @@ def inference(request):
         logger.info("압축파일 생성완료")
 
         # 압축파일 전송
-        compressed_vocal_file=tmp_path+"/compressed.7z" #/tmp/uuid/compressed.7z
+        
         s3_key = "vocal/"+str(uuid)
         s3.upload_file(compressed_vocal_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("vocal압축파일 aws업로드 완료")

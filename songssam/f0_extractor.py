@@ -5,6 +5,7 @@ from sklearn.cluster import KMeans
 from torch.nn import functional as F
 from torchaudio.transforms import Resample
 
+import boto3
 import pandas as pd
 import logging
 import glob
