@@ -359,7 +359,7 @@ def inference(request):
         # delete_files_in_folder(tmp_path+"/slient_noise")
         logger.info("tmp폴더 비우기")
         delete_files_in_folder(tmp_path)
-        
+        logger.info(df_json)
         return JsonResponse({"message":df_json},status=200)
     except Exception as e:
         error_message = str(e)
