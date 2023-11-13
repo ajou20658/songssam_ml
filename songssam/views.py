@@ -30,7 +30,7 @@ import audioread
 
 # Create your views here.
 logger = logging.getLogger(__name__)
-s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ23AQR4MPK',aws_secret_access_key='nSCu5JPOudC5xxtNnuCePDo+MRdJeXmnJxWQhd9Q')
+s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ22ODM76PP',aws_secret_access_key='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')
 bucket = "songssam.site"
 
 
