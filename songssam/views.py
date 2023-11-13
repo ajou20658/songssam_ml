@@ -17,6 +17,7 @@ from .lib import dataset
 from .lib import nets
 from .lib import spec_utils
 
+
 import magic
 import librosa
 import numpy as np
@@ -243,18 +244,24 @@ def inference(request):
         gpu = 0
         
         print('loading model...', end=' ')
-        device = torch.device('cpu')
         model = nets.CascadedNet(args.n_fft, 32, 128)
-        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
-        if gpu >= 0:
-            if torch.cuda.is_available():
-                device = torch.device('cuda:{}'.format(gpu))
-                model.to(device)
-            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-                device = torch.device('mps')
-                model.to(device)
+        model.load_state_dict(torch.load(args.pretrained_model))
+
+        if torch.cuda.is_available():
+            device = torch.device('cuda')
+            if torch.cuda.device_count() > 1:
+                model = torch.nn.DataParallel(model)
+            model.to(device)
+        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            device = torch.device('mps')
+            model.to(device)
+        else:
+            device = torch.device('cpu')
+            model.to(device)
+
         logger.info('model done')
-        
+
+
         X, sr = librosa.load(
             filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
