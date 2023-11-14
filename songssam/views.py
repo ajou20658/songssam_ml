@@ -367,12 +367,11 @@ def send_post_request(number_list,status_code,uuid):
         'status_code':status_code,
         'message':uuid
     }
-    
+
     requests.post(url,json=data)
 
 @csrf_exempt
 @api_view(['POST'])
-@sync_to_async
 async def inference(request):
     serializer = SongSerializer(data = request.data)
     
