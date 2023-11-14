@@ -373,6 +373,7 @@ def send_post_request(number_list,status_code,uuid):
 
 @csrf_exempt
 @api_view(['POST'])
+@sync_to_async
 async def inference(request):
     serializer = SongSerializer(data = request.data)
     
