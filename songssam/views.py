@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from tqdm import tqdm
 from pydub import AudioSegment
+from asgiref.sync import sync_to_async
 
 from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
 
@@ -11,12 +12,12 @@ import py7zr
 import logging
 import easydict
 import os
+import requests
 
 from .serializers import SongSerializer
 from .lib import dataset
 from .lib import nets
 from .lib import spec_utils
-
 
 import magic
 import librosa
@@ -206,22 +207,9 @@ def load_audio_file(file_path, target_sr=None):
 
 
 
-    
-
-@csrf_exempt
-@api_view(['POST'])
-def inference(request):
-    serializer = SongSerializer(data = request.data)
+async def inference2(fileKey,isUser,uuid):
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp"
-    # logger.info(serializer)
-    if serializer.is_valid():
-        fileKey = serializer.validated_data['fileKey']
-        isUser = serializer.validated_data['isUser']
-        uuid = serializer.validated_data['uuid']
-    else:
-        logger.info("serializer 오류 발생")
-    
     if not os.path.exists(tmp_path+"/"+str(uuid)):
         os.makedirs(tmp_path+"/"+str(uuid))
     else:
@@ -314,8 +302,6 @@ def inference(request):
         ##tmp_path/uuid/silent_noise 폴더 안의 파일을 리스트로 가져옴
         os.remove(tmp_path+"/mp3") #원본 mp3파일 삭제
         
-        
-        
         filenum=0
         if not os.path.exists(tmp_path+"/raw"):
             os.makedirs(tmp_path+"/raw")
@@ -326,7 +312,6 @@ def inference(request):
         else:
             logger.info("folder already exists")
 
-        
         filenum = split_audio_slicing(filenum,tmp_path+"/Fix_Vocal.wav",tmp_path+"/raw")
         logger.info(filenum)
         os.remove(output_file_path)
@@ -337,7 +322,6 @@ def inference(request):
             logger.info("folder already exists")
         filter(tmp_path,threshold)
         
-
         start_F0_Extractor(tmp_path) #tmp/uuid
         f0 = concatnator(tmp_path)
         _, centroids = extract_centroid(f0)
@@ -349,7 +333,6 @@ def inference(request):
             #split_path : tmp/uuid/slice
             #tmp_path : tmp/uuid
         logger.info("압축파일 생성완료")
-
         # 압축파일 전송
         
         s3_key = "vocal/"+str(uuid)
@@ -367,15 +350,47 @@ def inference(request):
         logger.info("tmp폴더 비우기")
         delete_files_in_folder(tmp_path)
         logger.info(df_json)
-        return JsonResponse({"message":df_json},status=200)
+        # return JsonResponse({"message":df_json},status=200)
+        send_post_request(data,200,uuid)
+
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
-        return JsonResponse({"error":"error"},status = 411)
-    # finally:
-    #     input_resource.close()
+        send_post_request([],848,uuid)
+        # return JsonResponse({"error":"error"},status = 411)
 
-     
+def send_post_request(number_list,status_code,uuid):
+    url = 'https://songssam.site:8443/song/response'
+
+    data = {
+        'f0':number_list,
+        'status_code':status_code,
+        'message':uuid
+    }
+    
+    requests.post(url,json=data)
+
+@csrf_exempt
+@api_view(['POST'])
+@sync_to_async
+async def inference(request):
+    serializer = SongSerializer(data = request.data)
+    
+    # logger.info(serializer)
+    if serializer.is_valid():
+        fileKey = serializer.validated_data['fileKey']
+        isUser = serializer.validated_data['isUser']
+        uuid = serializer.validated_data['uuid']
+    else:
+        logger.info("serializer 오류 발생")
+
+    await inference2(fileKey=fileKey,isUser=isUser,uuid=uuid)
+
+    return JsonResponse({"message":"Request O.K"},status=200)
+
+
+
+ 
 
 def filter(filepath,threshold):
     for root, dirs, files in os.walk(filepath+"/raw"):
