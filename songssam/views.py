@@ -8,6 +8,7 @@ from asgiref.sync import sync_to_async
 
 from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
 
+import asyncio
 import py7zr
 import logging
 import easydict
@@ -382,8 +383,9 @@ async def inference(request):
         uuid = serializer.validated_data['uuid']
     else:
         logger.info("serializer 오류 발생")
+        return JsonResponse({"message":"Invalid data"},status=400)
 
-    inference_result =  inference2(fileKey=fileKey,isUser=isUser,uuid=uuid)
+    asyncio.create_task(inference2(fileKey=fileKey,isUser=isUser,uuid=uuid))
 
     return JsonResponse({"message":"Request O.K"},status=200)
 
