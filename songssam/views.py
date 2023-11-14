@@ -206,8 +206,8 @@ def load_audio_file(file_path, target_sr=None):
     return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
 
 
-
-async def inference2(fileKey,isUser,uuid):
+@sync_to_async
+def inference2(fileKey,isUser,uuid):
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp"
     if not os.path.exists(tmp_path+"/"+str(uuid)):
@@ -383,7 +383,7 @@ async def inference(request):
     else:
         logger.info("serializer 오류 발생")
 
-    await inference2(fileKey=fileKey,isUser=isUser,uuid=uuid)
+    inference_result =  inference2(fileKey=fileKey,isUser=isUser,uuid=uuid)
 
     return JsonResponse({"message":"Request O.K"},status=200)
 
