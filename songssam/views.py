@@ -4,16 +4,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from tqdm import tqdm
 from pydub import AudioSegment
-from asgiref.sync import sync_to_async
 
 from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
 
-import asyncio
 import py7zr
 import logging
 import easydict
 import os
-import requests
 
 from .serializers import SongSerializer
 from .lib import dataset
@@ -206,9 +203,17 @@ def load_audio_file(file_path, target_sr=None):
             audio_data.append(frame)
     return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
 
-
-@sync_to_async
-def inference2(fileKey,isUser,uuid):
+@csrf_exempt
+@api_view(['POST'])
+def inference(request):
+    serializer = SongSerializer(data = request.data)
+    if serializer.is_valid():
+        fileKey = serializer.validated_data['fileKey']
+        isUser = serializer.validated_data['isUser']
+        uuid = serializer.validated_data['uuid']
+    else:
+        logger.info("serializer 오류 발생")
+        return JsonResponse({"error":"error"},status = 411)
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp"
     if not os.path.exists(tmp_path+"/"+str(uuid)):
@@ -235,6 +240,7 @@ def inference2(fileKey,isUser,uuid):
         print('loading model...', end=' ')
         model = nets.CascadedNet(args.n_fft, 32, 128)
         model.load_state_dict(torch.load(args.pretrained_model))
+
 
         if torch.cuda.is_available():
             device = torch.device('cuda')
@@ -351,44 +357,44 @@ def inference2(fileKey,isUser,uuid):
         logger.info("tmp폴더 비우기")
         delete_files_in_folder(tmp_path)
         logger.info(df_json)
-        # return JsonResponse({"message":df_json},status=200)
-        send_post_request(data,200,uuid)
+        return JsonResponse({"message":df_json},status=200)
+        # send_post_request(data,200,uuid)
 
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
-        send_post_request([],848,uuid)
-        # return JsonResponse({"error":"error"},status = 411)
+        # send_post_request([],848,uuid)
+        return JsonResponse({"error":"error"},status = 411)
 
-def send_post_request(number_list,status_code,uuid):
-    url = 'https://songssam.site:8443/song/response'
+# def send_post_request(number_list,status_code,uuid):
+#     url = 'https://songssam.site:8443/song/response'
 
-    data = {
-        'f0':number_list,
-        'status_code':status_code,
-        'message':uuid
-    }
+#     data = {
+#         'f0':number_list,
+#         'status_code':status_code,
+#         'message':uuid
+#     }
 
-    requests.post(url,json=data)
+#     requests.post(url,json=data)
 
-@csrf_exempt
-@api_view(['POST'])
-@sync_to_async
-async def inference(request):
-    serializer = SongSerializer(data = request.data)
+# @csrf_exempt
+# @api_view(['POST'])
+# @sync_to_async
+# async def inference(request):
+#     serializer = SongSerializer(data = request.data)
     
-    # logger.info(serializer)
-    if serializer.is_valid():
-        fileKey = serializer.validated_data['fileKey']
-        isUser = serializer.validated_data['isUser']
-        uuid = serializer.validated_data['uuid']
-    else:
-        logger.info("serializer 오류 발생")
-        return JsonResponse({"message":"Invalid data"},status=400)
+#     # logger.info(serializer)
+#     if serializer.is_valid():
+#         fileKey = serializer.validated_data['fileKey']
+#         isUser = serializer.validated_data['isUser']
+#         uuid = serializer.validated_data['uuid']
+#     else:
+#         logger.info("serializer 오류 발생")
+#         return JsonResponse({"message":"Invalid data"},status=400)
 
-    asyncio.create_task(inference2(fileKey=fileKey,isUser=isUser,uuid=uuid))
+#     asyncio.create_task(inference2(fileKey=fileKey,isUser=isUser,uuid=uuid))
 
-    return JsonResponse({"message":"Request O.K"},status=200)
+#     return JsonResponse({"message":"Request O.K"},status=200)
 
 
 
