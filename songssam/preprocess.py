@@ -1,25 +1,24 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from tqdm import tqdm
-from pydub import AudioSegment
-from asgiref.sync import sync_to_async
 
-from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
-
-import asyncio
 import py7zr
 import logging
 import easydict
 import os
 import requests
 
-from .serializers import SongSerializer
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
+
+from asgiref.sync import sync_to_async
+from tqdm import tqdm
+from pydub import AudioSegment
 from .lib import dataset
 from .lib import nets
 from .lib import spec_utils
+from .serializers import SongSerializer
+from django.http import JsonResponse
 
+import asyncio
+import json
 import magic
 import librosa
 import numpy as np
@@ -30,102 +29,33 @@ import boto3
 import logging
 import audioread
 
-# Create your views here.
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ22ODM76PP',aws_secret_access_key='6qHd4dBq9JF8w1V8UjUzP+xoCjXcB8F8bWrQRntP')
 bucket = "songssam.site"
+def filter(filepath,threshold):
+    for root, dirs, files in os.walk(filepath+"/raw"):
+        filenum=0
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            try:
+                y, sr = librosa.load(file_path)
+                D = librosa.stft(y)
+                
+                # STFT의 크기(에너지) 계산
+                magnitude = np.abs(D)
 
+                # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
+                np.mean(magnitude)  # 임계값 설정 (평균값 사용)
+                if np.mean(magnitude) < threshold :
+                    os.remove(file_path)
+                    print(f"Deleted: {file_path}")
+                else:
+                    filenum=filenum+1
+                    os.rename(file_path,filepath+f"/audio/{filenum}.wav")
+            except Exception as e:
+                print(f"Error deleting {file_path}: {e}")
 
-class Separator(object):
-    def __init__(self, model, device, batchsize, cropsize, postprocess=False):
-        self.model = model
-        self.offset = model.offset
-        self.device = device
-        self.batchsize = batchsize
-        self.cropsize = cropsize
-        self.postprocess = postprocess
-
-    def _separate(self, X_mag_pad, roi_size):
-        X_dataset = []
-        patches = (X_mag_pad.shape[2] - 2 * self.offset) // roi_size
-        for i in range(patches):
-            start = i * roi_size
-            X_mag_crop = X_mag_pad[:, :, start:start + self.cropsize]
-            X_dataset.append(X_mag_crop)
-
-        X_dataset = np.asarray(X_dataset)
-
-        self.model.eval()
-        with torch.no_grad():
-            mask = []
-            # To reduce the overhead, dataloader is not used.
-            for i in tqdm(range(0, patches, self.batchsize)):
-                X_batch = X_dataset[i: i + self.batchsize]
-                X_batch = torch.from_numpy(X_batch).to(self.device)
-
-                pred = self.model.predict_mask(X_batch)
-
-                pred = pred.detach().cpu().numpy()
-                pred = np.concatenate(pred, axis=2)
-                mask.append(pred)
-
-            mask = np.concatenate(mask, axis=2)
-
-        return mask
-
-    def _preprocess(self, X_spec):
-        X_mag = np.abs(X_spec)
-        X_phase = np.angle(X_spec)
-
-        return X_mag, X_phase
-
-    def _postprocess(self, mask, X_mag, X_phase):
-        if self.postprocess:
-            mask = spec_utils.merge_artifacts(mask)
-
-        y_spec = mask * X_mag * np.exp(1.j * X_phase)
-        v_spec = (1 - mask) * X_mag * np.exp(1.j * X_phase)
-
-        return y_spec, v_spec
-
-    def separate(self, X_spec):
-        X_mag, X_phase = self._preprocess(X_spec)
-
-        n_frame = X_mag.shape[2]
-        pad_l, pad_r, roi_size = dataset.make_padding(n_frame, self.cropsize, self.offset)
-        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
-        X_mag_pad /= X_mag_pad.max()
-
-        mask = self._separate(X_mag_pad, roi_size)
-        mask = mask[:, :, :n_frame]
-
-        y_spec, v_spec = self._postprocess(mask, X_mag, X_phase)
-
-        return y_spec, v_spec
-
-    def separate_tta(self, X_spec):
-        X_mag, X_phase = self._preprocess(X_spec)
-
-        n_frame = X_mag.shape[2]
-        pad_l, pad_r, roi_size = dataset.make_padding(n_frame, self.cropsize, self.offset)
-        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
-        X_mag_pad /= X_mag_pad.max()
-
-        mask = self._separate(X_mag_pad, roi_size)
-
-        pad_l += roi_size // 2
-        pad_r += roi_size // 2
-        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
-        X_mag_pad /= X_mag_pad.max()
-
-        mask_tta = self._separate(X_mag_pad, roi_size)
-        mask_tta = mask_tta[:, :, roi_size // 2:]
-        mask = (mask[:, :, :n_frame] + mask_tta[:, :, :n_frame]) * 0.5
-
-        y_spec, v_spec = self._postprocess(mask, X_mag, X_phase)
-
-        return y_spec, v_spec
-
+# @sync_to_async
 def split_audio_silent(y,sr, output_audio_dir):
     # 오디오 파일 로드
     assert isinstance(y,np.ndarray),"y must be a numpy array"
@@ -148,7 +78,7 @@ def split_audio_silent(y,sr, output_audio_dir):
 
     sf.write(output_audio_dir+"/Fix_Vocal.wav",y_noisy,sr)
     return threshold
-
+# @sync_to_async
 def delete_files_in_folder(folder_path):
     for root, dirs, files in os.walk(folder_path):
         for filename in files:
@@ -159,7 +89,8 @@ def delete_files_in_folder(folder_path):
                     print(f"Deleted: {file_path}")
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
-
+                
+# @sync_to_async
 def folder_to_7z(folder_path,output_dir): #to output_dir
     with py7zr.SevenZipFile(output_dir,'w') as archive:
         for filename in os.listdir(folder_path):
@@ -167,11 +98,13 @@ def folder_to_7z(folder_path,output_dir): #to output_dir
             archive.write(folder_path+"/"+filename, filename)
     logger.info("압축 완료 : "+output_dir)
 
+# @sync_to_async
 def extract_7z(file_path,extract_dir):
     with py7zr.SevenZipFile(file_path+'/compressed.7z','r') as archive:
         archive.extractall(extract_dir)
     logger.info("압축 해제 완료")
 
+# @sync_to_async
 def detect_file_type(file_path):
     mime = magic.Magic()
     file_type = mime.from_file(file_path)
@@ -184,6 +117,7 @@ def detect_file_type(file_path):
         return "PCM_32"
     return "Type Err"
 
+# @sync_to_async
 def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 경로
     segment_length_ms = 10000
     audio = AudioSegment.from_wav(input_audio_file)
@@ -198,6 +132,7 @@ def split_audio_slicing(filenum, input_audio_file,output_audio_dir): #input은 �
     logger.info("split complete")
     return filenum
 
+# @sync_to_async
 def load_audio_file(file_path, target_sr=None):
     with audioread.audio_open(file_path) as audio:
         sr = audio.samplerate
@@ -205,9 +140,43 @@ def load_audio_file(file_path, target_sr=None):
         for frame in audio:
             audio_data.append(frame)
     return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
+def send_post_request(number_list,status_code,uuid):
+        url = 'https://songssam.site:8443/song/response'
 
+        data = {
+            'f0':number_list,
+            'status_code':status_code,
+            'message':uuid
+        }
 
-@sync_to_async
+        requests.post(url,json=data)
+
+class SomeConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+
+    async def disconnect(self, code):
+        return await super().disconnect(code)
+    
+    async def receive(self,text_data):
+        data = json.loads(text_data)
+        serializer = SongSerializer(data = data)
+        
+        # logger.info(serializer)
+        if serializer.is_valid():
+            fileKey = serializer.validated_data['fileKey']
+            isUser = serializer.validated_data['isUser']
+            uuid = serializer.validated_data['uuid']
+            asyncio.create_task(inference2(fileKey=fileKey,isUser=isUser,uuid=uuid))
+            await self.send(text_data=json.dumps({"message":"GOOD"}))
+        else:
+            logger.info("serializer 오류 발생")
+            await self.send(text_data=json.dumps({"message":"BAD"}))
+
+        
+
+    
+    
 def inference2(fileKey,isUser,uuid):
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp"
@@ -360,69 +329,98 @@ def inference2(fileKey,isUser,uuid):
         send_post_request([],848,uuid)
         # return JsonResponse({"error":"error"},status = 411)
 
-def send_post_request(number_list,status_code,uuid):
-    url = 'https://songssam.site:8443/song/response'
-
-    data = {
-        'f0':number_list,
-        'status_code':status_code,
-        'message':uuid
-    }
-
-    requests.post(url,json=data)
-
-@csrf_exempt
-@api_view(['POST'])
-@sync_to_async
-async def inference(request):
-    serializer = SongSerializer(data = request.data)
-    
-    # logger.info(serializer)
-    if serializer.is_valid():
-        fileKey = serializer.validated_data['fileKey']
-        isUser = serializer.validated_data['isUser']
-        uuid = serializer.validated_data['uuid']
-    else:
-        logger.info("serializer 오류 발생")
-        return JsonResponse({"message":"Invalid data"},status=400)
-
-    asyncio.create_task(inference2(fileKey=fileKey,isUser=isUser,uuid=uuid))
-
-    return JsonResponse({"message":"Request O.K"},status=200)
 
 
 
- 
+# Create your views here.
 
-def filter(filepath,threshold):
-    for root, dirs, files in os.walk(filepath+"/raw"):
-        filenum=0
-        for filename in files:
-            file_path = os.path.join(root, filename)
-            try:
-                y, sr = librosa.load(file_path)
-                D = librosa.stft(y)
-                
-                # STFT의 크기(에너지) 계산
-                magnitude = np.abs(D)
 
-                # 크기가 작은 스펙트로그램 영역을 식별하여 마스크 생성
-                np.mean(magnitude)  # 임계값 설정 (평균값 사용)
-                if np.mean(magnitude) < threshold :
-                    os.remove(file_path)
-                    print(f"Deleted: {file_path}")
-                else:
-                    filenum=filenum+1
-                    os.rename(file_path,filepath+f"/audio/{filenum}.wav")
-            except Exception as e:
-                print(f"Error deleting {file_path}: {e}")
+class Separator(object):
+    def __init__(self, model, device, batchsize, cropsize, postprocess=False):
+        self.model = model
+        self.offset = model.offset
+        self.device = device
+        self.batchsize = batchsize
+        self.cropsize = cropsize
+        self.postprocess = postprocess
 
-@csrf_exempt
-@api_view(['GET'])
-def opencheck(request):
-    return JsonResponse({"message":"Open"},status=200)
+    def _separate(self, X_mag_pad, roi_size):
+        X_dataset = []
+        patches = (X_mag_pad.shape[2] - 2 * self.offset) // roi_size
+        for i in range(patches):
+            start = i * roi_size
+            X_mag_crop = X_mag_pad[:, :, start:start + self.cropsize]
+            X_dataset.append(X_mag_crop)
 
-@csrf_exempt
-@api_view(['GET'])
-def opencheck2(request):
-    return JsonResponse({"message":"Open"},status=200)
+        X_dataset = np.asarray(X_dataset)
+
+        self.model.eval()
+        with torch.no_grad():
+            mask = []
+            # To reduce the overhead, dataloader is not used.
+            for i in tqdm(range(0, patches, self.batchsize)):
+                X_batch = X_dataset[i: i + self.batchsize]
+                X_batch = torch.from_numpy(X_batch).to(self.device)
+
+                pred = self.model.predict_mask(X_batch)
+
+                pred = pred.detach().cpu().numpy()
+                pred = np.concatenate(pred, axis=2)
+                mask.append(pred)
+
+            mask = np.concatenate(mask, axis=2)
+
+        return mask
+
+    def _preprocess(self, X_spec):
+        X_mag = np.abs(X_spec)
+        X_phase = np.angle(X_spec)
+
+        return X_mag, X_phase
+
+    def _postprocess(self, mask, X_mag, X_phase):
+        if self.postprocess:
+            mask = spec_utils.merge_artifacts(mask)
+
+        y_spec = mask * X_mag * np.exp(1.j * X_phase)
+        v_spec = (1 - mask) * X_mag * np.exp(1.j * X_phase)
+
+        return y_spec, v_spec
+
+    def separate(self, X_spec):
+        X_mag, X_phase = self._preprocess(X_spec)
+
+        n_frame = X_mag.shape[2]
+        pad_l, pad_r, roi_size = dataset.make_padding(n_frame, self.cropsize, self.offset)
+        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
+        X_mag_pad /= X_mag_pad.max()
+
+        mask = self._separate(X_mag_pad, roi_size)
+        mask = mask[:, :, :n_frame]
+
+        y_spec, v_spec = self._postprocess(mask, X_mag, X_phase)
+
+        return y_spec, v_spec
+
+    def separate_tta(self, X_spec):
+        X_mag, X_phase = self._preprocess(X_spec)
+
+        n_frame = X_mag.shape[2]
+        pad_l, pad_r, roi_size = dataset.make_padding(n_frame, self.cropsize, self.offset)
+        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
+        X_mag_pad /= X_mag_pad.max()
+
+        mask = self._separate(X_mag_pad, roi_size)
+
+        pad_l += roi_size // 2
+        pad_r += roi_size // 2
+        X_mag_pad = np.pad(X_mag, ((0, 0), (0, 0), (pad_l, pad_r)), mode='constant')
+        X_mag_pad /= X_mag_pad.max()
+
+        mask_tta = self._separate(X_mag_pad, roi_size)
+        mask_tta = mask_tta[:, :, roi_size // 2:]
+        mask = (mask[:, :, :n_frame] + mask_tta[:, :, :n_frame]) * 0.5
+
+        y_spec, v_spec = self._postprocess(mask, X_mag, X_phase)
+
+        return y_spec, v_spec
