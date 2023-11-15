@@ -397,3 +397,8 @@ def filter(filepath,threshold):
 @api_view(['GET'])
 def opencheck(request):
     return JsonResponse({"message":"Open"},status=200)
+
+@csrf_exempt
+@api_view(['GET'])
+def opencheck2(request):
+    return JsonResponse({"message":"Open"},status=200)
