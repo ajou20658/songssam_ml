@@ -1,0 +1,43 @@
+data:
+  block_size: 512
+  cnhubertsoft_gate: 10
+  duration: 4
+  encoder: hubertsoft
+  encoder_ckpt: pretrain/hubert/hubertsoft.pt
+  encoder_hop_size: 320
+  encoder_out_channels: 256
+  encoder_sample_rate: 16000.0
+  extensions:
+  - wav
+  f0_extractor: crepe
+  f0_max: 880
+  f0_min: 33
+  sampling_rate: 44100
+  train_path: data/train
+  valid_path: data/val
+device: cuda
+enhancer:
+  ckpt: pretrain/nsf_hifigan/model
+  type: nsf-hifigan
+env:
+  expdir: exp/combsub-test3
+  gpu_id: 0
+loss:
+  fft_max: 2048
+  fft_min: 256
+  n_scale: 4
+model:
+  n_spk: 1
+  type: CombSubFast
+train:
+  batch_size: 32
+  cache_all_data: true
+  cache_device: cpu
+  cache_fp16: true
+  epochs: 100000
+  interval_log: 10
+  interval_val: 2000
+  lr: 0.0005
+  num_workers: 4
+  save_opt: false
+  weight_decay: 0

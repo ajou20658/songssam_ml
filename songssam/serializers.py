@@ -14,3 +14,17 @@ class SongSerializer(serializers.Serializer):
         instance.isUser = validated_data.get('isUser', instance.isUser)
         instance.uuid = validated_data.get('uuid',instance.uuid)
         return instance
+
+class InferSerializer(serializers.Serializer):
+    wav_path = serializers.CharField(max_length=100)
+    fPtrPath = serializers.CharField(max_length=100)
+    uuid = serializers.CharField(max_length=100)
+
+    def create(self, validated_data):
+        return Song(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.fileKey = validated_data.get('fileKey', instance.fileKey)
+        instance.isUser = validated_data.get('isUser', instance.isUser)
+        instance.uuid = validated_data.get('uuid',instance.uuid)
+        return instance
