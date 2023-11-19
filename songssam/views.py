@@ -617,7 +617,7 @@ def voice_change_model(request):
     _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
     # 오디오 재샘플링
-    tar_audio = librosa.resample(_audio, _model_sr, daw_sample)
+    tar_audio = librosa.resample(_audio, orig_sr =_model_sr, target_sr=daw_sample)
     
     # 반환할 오디오 파일 작성
     # out_wav_path = tmp_path+"/generated.wav"
@@ -628,7 +628,7 @@ def voice_change_model(request):
     tar_audio = AudioSegment.from_mono_audiosegmentstar(tar_audio)
 
     # 오디오 데이터 합치기
-    combined_audio = mr_audio.overlay(tar_audio, positon=0)
+    combined_audio = mr_audio.overlay(tar_audio, position=0)
 
     # MP3로 오디오를 내보내고, 바이트로 읽어옵니다
     audio_bytes = combined_audio.export(format='mp3').read()
