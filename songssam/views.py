@@ -639,10 +639,11 @@ def voice_change_model(request):
     # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
     y1,sample_rate1=librosa.load(MR_file_path,mono=True)
     logger.info(sample_rate1)
-    y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True)
+
+    y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True,sr=sample_rate1)
     logger.info(sample_rate2)
     
-    y1 = librosa.resample(y1,sample_rate1,sample_rate2)
+    # y1 = librosa.resample(y1,sample_rate1,sample_rate2)
 
     min_len=min(len(y1),len(y2))
     y1 = y1[:min_len]
