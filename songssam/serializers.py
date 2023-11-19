@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Song
+from .models import Song,Inference
 
 class SongSerializer(serializers.Serializer):
     fileKey = serializers.CharField(max_length=100)
@@ -21,7 +21,7 @@ class InferSerializer(serializers.Serializer):
     uuid = serializers.CharField(max_length=100)
 
     def create(self, validated_data):
-        return Song(**validated_data)
+        return Inference(**validated_data)
 
     def update(self, instance, validated_data):
         instance.fileKey = validated_data.get('fileKey', instance.fileKey)
