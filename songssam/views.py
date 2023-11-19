@@ -595,7 +595,6 @@ def voice_change_model(request):
         waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
 
         sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
-        wav_data.seek(0)
         logger.info("위 경로에 MR 저장완료")
     except Exception as e:
         error_message = str(e)
@@ -631,7 +630,7 @@ def voice_change_model(request):
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
 
     # 오디오 파일을 mp3 형식으로 변환
-    mp3 = AudioSegment.from_file(out_wav_path,format="wav")
+    mp3 = AudioSegment.from_file(wav_data,format="wav")
     os.remove("./"+pt_filename)
     audio_bytes =mp3.export(format='mp3').read()
     
