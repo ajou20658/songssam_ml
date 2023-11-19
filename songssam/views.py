@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from tqdm import tqdm
 from pydub import AudioSegment
 from tempfile import NamedTemporaryFile
+import tempfile
 
 from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
 
@@ -32,7 +33,6 @@ import torch
 import boto3
 import logging
 import audioread
-import IPython as ip
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -612,7 +612,7 @@ def voice_change_model(request):
     
     
     # 모델 추론
-    _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
+    _audio, _model_sr = svc_model.infer(wav_data.getvalue(), f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
     # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
@@ -620,6 +620,7 @@ def voice_change_model(request):
     # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
+
     # 오디오 파일을 mp3 형식으로 변환
     mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
@@ -641,6 +642,7 @@ def voice_change_model(request):
     # os.remove(tmpfile2.name)
     # # Export the mixed audio to MP3
     # audio_bytes = mixed_audio.export(format='mp3').read()
+
     
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
