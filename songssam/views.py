@@ -649,20 +649,11 @@ def voice_change_model(request):
     y1 = y1[:min_len]
     y2 = y2[:min_len]
 
-    with NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile1, NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile2:
-        sf.write(tmpfile1.name, y1, sample_rate1, subtype='PCM_16', format='WAV')
-        sf.write(tmpfile2.name, y2, sample_rate2, subtype='PCM_16', format='WAV')
+    audio1 = AudioSegment(y1.tobytes(), frame_rate=sample_rate2, sample_width=y1.dtype.itemsize, channels=1)
+    audio2 = AudioSegment(y2.tobytes(), frame_rate=sample_rate2, sample_width=y2.dtype.itemsize, channels=1)
 
-        # Create AudioSegment instances from the temporary WAV files
-        audio_segment1 = AudioSegment.from_file(tmpfile1.name, format="wav")
-        audio_segment2 = AudioSegment.from_file(tmpfile2.name, format="wav")
-
-        # Mix the audio segments
-        mixed_audio = AudioSegment.from_mono_audiosegments(AudioSegment(y1), AudioSegment(y2))
-
-    # Remove the temporary WAV files
-    os.remove(tmpfile1.name)
-    os.remove(tmpfile2.name)
+    # Mix the audio segments
+    mixed_audio = audio1.overlay(audio2)
 
     # Export the mixed audio to MP3
     audio_bytes = mixed_audio.export(format='mp3').read()
