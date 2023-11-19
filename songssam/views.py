@@ -609,7 +609,7 @@ def voice_change_model(request):
     f_safe_prefix_pad_length = float(0)
     f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
-    daw_sample = int(44100)
+    daw_sample = int(0)
 
     if enable_spk_id_cover:
         int_speak_id = spk_id
