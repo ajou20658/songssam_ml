@@ -394,7 +394,10 @@ spk_mix_dict = None
 @csrf_exempt
 @api_view(['GET'])
 def voice_change_model(request):
-    serializer = InferSerializer(data= request.query_params)
+    # 요청에서 쿼리 파라미터를 추출하여 InferSerializer로 변환
+    serializer = InferSerializer(data=request.query_params)
+
+    # serializer가 유효한지 확인
     if serializer.is_valid():
         f_wave_path = serializer.validated_data["wav_path"]
         f_ptr_path = serializer.validated_data["fPtrPath"]
@@ -403,19 +406,26 @@ def voice_change_model(request):
         logger.info("serializer 오류")
         return JsonResponse({"error":"error"},status=404)
 
+    # 결과를 저장할 경로 생성
     if not os.path.exists("exp/"+str(uuid)):
         os.makedirs("exp/"+str(uuid))
     else:
         logger.info("folder already exists")
+
     mp3_filename = "exp/"+str(uuid)+".mp3"
-    # response1 = s3.get_object(Bucket=bucket,Key=f_wave_path)
+
+
+    # S3에서 파일 다운로드
     s3.download_file(bucket,f_wave_path,mp3_filename)
+
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp"
+
+    # 별도의 변수를 io.BytesIO 객체로 초기화(이후에 wav 데이터로 사용됨)
     wav_data = io.BytesIO
-    # s3.download_file(bucket,f_ptr_path,pt_filename)
+
     try:
-        # input_resource = wave.open(filename,'rb')
+        # 음성 변환에 필요한 매개변수 설정
         args = easydict.EasyDict({
             "pretrained_model" : root+'/songssam/models/baseline.pth',
             "sr" : 44100,
@@ -425,13 +435,13 @@ def voice_change_model(request):
             "cropsize" : 256,
             "postprocess" : 'store_true'
         })
-        gpu = 0
         
+        # 모델 로드
         print('loading model...', end=' ')
         model = nets.CascadedNet(args.n_fft, 32, 128)
         model.load_state_dict(torch.load(args.pretrained_model))
 
-
+        # 모델을 사용 가능한 디바이스에 할당
         if torch.cuda.is_available():
             device = torch.device('cuda')
             if torch.cuda.device_count() > 1:
@@ -446,33 +456,37 @@ def voice_change_model(request):
 
         logger.info('model done')
 
-
+        # mp3 파일 로드
         X, sr = librosa.load(
             mp3_filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
+        # 모노 오디오를 스테레오로 변환
         if X.ndim == 1:
-        # mono to stereo
             X = np.asarray([X, X])
         logger.info(X.ndim)
+
+        # 파일 형식 검출
         audio_format2 = detect_file_type(mp3_filename)
         logger.info(audio_format2)
-        # logger.info("file data, sr extract...")
-        # if(audio_format2=="Type Err"):
 
-        #     return JsonResponse({"error":"wrong type error"},status = 411)
+        # 음성 데이터를 스펙트럼으로 변환
         X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
         logger.info(X_spec.dtype)
 
+        # 분리기를 이용하여 스펙트럼 분리
         sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
-
         y_spec, v_spec = sp.separate_tta(X_spec)
+
+
         logger.info(y_spec.ndim)
         logger.info(y_spec.dtype)
         print('inverse stft of instruments...', end=' ')
         
+
         logger.info('MR loading...')
         waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
         
+        # MR 파일 저장
         MR_file_path = tmp_path+"/Mr.wav"
         sf.write(MR_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
 
@@ -487,48 +501,49 @@ def voice_change_model(request):
         logger.error(error_message)
     
     pt_filename = "exp/"+str(uuid)+".pt"
+    # S3에서 .pt 파일 다운로드
     s3.download_file(bucket,f_ptr_path,pt_filename)
 
-    # get fSafePrefixPadLength
-    # f_safe_prefix_pad_length = float(request_form.get("fSafePrefixPadLength", 0))
+    # 변조 정보 설정
     f_safe_prefix_pad_length = float(0)
-    print("f_safe_prefix_pad_length:"+str(f_safe_prefix_pad_length))
-    # 变调信息
-    # f_pitch_change = float(request_form.get("fPitchChange", 0))
-    f_pitch_change = float(0)
-    # 获取spk_id
-    # int_speak_id = int(request_form.get("sSpeakId", 0))
+    f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
+    daw_sample = int(0)
+
     if enable_spk_id_cover:
         int_speak_id = spk_id
-    # print("说话人:" + str(int_speak_id))
-    # DAW所需的采样率
-    # daw_sample = int(float(request_form.get("sampleRate", 0)))
-    daw_sample = int(0)
+
+    
     svc_model = SvcDDSP(pt_filename, use_vocoder_based_enhancer, enhancer_adaptive_key, select_pitch_extractor,
                         limit_f0_min, limit_f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover)
-    # http获得wav文件并转换
+    
     
     input_wav_read = io.BytesIO(wav_data)
-    # 模型推理
+
+    # 모델 추론
     _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
+    
+    # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
-    # 返回音频
+    
+    # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
     out_wav_path.seek(0)
 
-
+    # 오디오 파일을 mp3 형식으로 변환
     mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
     audio_bytes = mp3.export(format='mp3').read()
+
+    # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
     y1,sample_rate1=librosa.load(MR_file_path,mono=True)
     y2,sample_rate2=librosa.load(mp3,mono=True)
     ip.display.Audio((y1+y2)/2, rate=int((sample_rate1+sample_rate2)/2))
+
     os.remove("./"+out_wav_path)
-    # return send_file(out_wav_path, download_name="temp.wav", as_attachment=True)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
-    response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
+    # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
 
     return response
 
