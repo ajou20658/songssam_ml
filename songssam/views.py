@@ -625,8 +625,8 @@ def voice_change_model(request):
     # mp3 = AudioSegment.from_file(out_wav_path,format="wav")
 
     mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
-    tar_audio = AudioSegment.from_mono_audiosegments(tar_audio)
-
+    tar_audio = [AudioSegment(data=tar_audio[i].tobytes(), sample_width=tar_audio[i].dtype.itemsize, frame_rate=daw_sample, channels=1)
+             for i in range(len(tar_audio))]
     # 오디오 데이터 합치기
     combined_audio = mr_audio.overlay(tar_audio, position=0)
 
