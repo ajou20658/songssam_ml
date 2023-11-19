@@ -617,16 +617,16 @@ def voice_change_model(request):
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
     
     # 반환할 오디오 파일 작성
-    out_wav_path = tmp_path+"/generated.wav"
-    sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
-    mp3 = AudioSegment.from_file(out_wav_path,format="wav")
+    # out_wav_path = tmp_path+"/generated.wav"
+    # sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
+    # mp3 = AudioSegment.from_file(out_wav_path,format="wav")
 
     y1,sample_rate1=librosa.load(MR_file_path,mono=True)
     min_len=min(len(y1),len(tar_audio))
     y1 = y1[:min_len]
     tar_audio = tar_audio[:min_len]
 
-    audio_bytes =tar_audio.export(format='mp3').read()
+    audio_bytes =librosa.output.to_bytes(tar_audio,sr=daw_sample,format="mp3")
     
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
