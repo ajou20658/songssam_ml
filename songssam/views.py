@@ -534,7 +534,7 @@ def voice_change_model(request):
     model = nets.CascadedNet(args.n_fft, 32, 128)
     model.load_state_dict(torch.load(args.pretrained_model))
 
-    gpu = 1
+    gpu = 0
     
     print('loading model...', end=' ')
     device = torch.device('cpu')
