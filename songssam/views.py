@@ -517,82 +517,80 @@ def voice_change_model(request):
     s3.download_file(bucket,f_wave_path,mp3_filename)
     # 별도의 변수를 io.BytesIO 객체로 초기화(이후에 wav 데이터로 사용됨)
     wav_data = tmp_path+"/Wav.wav"
-    try:
+    
         # 음성 변환에 필요한 매개변수 설정
-        args = easydict.EasyDict({
-            "pretrained_model" : root+'/songssam/models/baseline.pth',
-            "sr" : 44100,
-            "n_fft" : 2048,
-            "hop_length" : 1024,
-            "batchsize" : 4,
-            "cropsize" : 256,
-            "postprocess" : 'store_true'
-        })
-        
-        # 모델 로드
-        print('loading model...', end=' ')
-        model = nets.CascadedNet(args.n_fft, 32, 128)
-        model.load_state_dict(torch.load(args.pretrained_model))
+    args = easydict.EasyDict({
+        "pretrained_model" : root+'/songssam/models/baseline.pth',
+        "sr" : 44100,
+        "n_fft" : 2048,
+        "hop_length" : 1024,
+        "batchsize" : 4,
+        "cropsize" : 256,
+        "postprocess" : 'store_true'
+    })
+    
+    # 모델 로드
+    print('loading model...', end=' ')
+    model = nets.CascadedNet(args.n_fft, 32, 128)
+    model.load_state_dict(torch.load(args.pretrained_model))
 
-        gpu = 1
-        
-        print('loading model...', end=' ')
-        device = torch.device('cpu')
-        model = nets.CascadedNet(args.n_fft, 32, 128)
-        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
-        if gpu >= 0:
-            if torch.cuda.is_available():
-                device = torch.device('cuda:{}'.format(gpu))
-                model.to(device)
-            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-                device = torch.device('mps')
-                model.to(device)
+    gpu = 1
+    
+    print('loading model...', end=' ')
+    device = torch.device('cpu')
+    model = nets.CascadedNet(args.n_fft, 32, 128)
+    model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+    if gpu >= 0:
+        if torch.cuda.is_available():
+            device = torch.device('cuda:{}'.format(gpu))
+            model.to(device)
+        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            device = torch.device('mps')
+            model.to(device)
 
-        logger.info('model done')
+    logger.info('model done')
 
-        # mp3 파일 로드
-        X, sr = librosa.load(
-            mp3_filename, sr=args.sr, mono=True, dtype=np.float32, res_type='kaiser_fast')
-        
-        # 모노 오디오를 스테레오로 변환
-        if X.ndim == 1:
-            X = np.asarray([X, X])
-        logger.info(X.ndim)
+    # mp3 파일 로드
+    X, sr = librosa.load(
+        mp3_filename, sr=args.sr, mono=True, dtype=np.float32, res_type='kaiser_fast')
+    
+    # 모노 오디오를 스테레오로 변환
+    if X.ndim == 1:
+        X = np.asarray([X, X])
+    logger.info(X.ndim)
 
-        # 파일 형식 검출
-        audio_format2 = detect_file_type(mp3_filename)
-        logger.info(audio_format2)
+    # 파일 형식 검출
+    audio_format2 = detect_file_type(mp3_filename)
+    logger.info(audio_format2)
 
-        # 음성 데이터를 스펙트럼으로 변환
-        X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
-        logger.info(X_spec.dtype)
+    # 음성 데이터를 스펙트럼으로 변환
+    X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
+    logger.info(X_spec.dtype)
 
-        # 분리기를 이용하여 스펙트럼 분리
-        sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
-        y_spec, v_spec = sp.separate_tta(X_spec)
+    # 분리기를 이용하여 스펙트럼 분리
+    sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
+    y_spec, v_spec = sp.separate_tta(X_spec)
 
 
-        logger.info(y_spec.ndim)
-        logger.info(y_spec.dtype)
-        print('inverse stft of instruments...', end=' ')
-        
+    logger.info(y_spec.ndim)
+    logger.info(y_spec.dtype)
+    print('inverse stft of instruments...', end=' ')
+    
 
-        logger.info('MR loading...')
-        waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
-        
-        # MR 파일 저장
-        MR_file_path = tmp_path+"/Mr.wav"
-        sf.write(MR_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
+    logger.info('MR loading...')
+    waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
+    
+    # MR 파일 저장
+    MR_file_path = tmp_path+"/Mr.wav"
+    sf.write(MR_file_path,waveT.T,sr,subtype = 'PCM_16',format='WAV')
 
-        ##########################################################
-        logger.info('보컬 loading...')
-        waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
+    ##########################################################
+    logger.info('보컬 loading...')
+    waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
 
-        sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
-        logger.info("위 경로에 MR 저장완료")
-    except Exception as e:
-        error_message = str(e)
-        logger.error(error_message)
+    sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
+    logger.info("위 경로에 MR 저장완료")
+   
     
     pt_filename = tmp_path+"/Voice.pt"
     # S3에서 .pt 파일 다운로드
