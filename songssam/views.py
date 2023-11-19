@@ -621,10 +621,10 @@ def voice_change_model(request):
     # mp3 = AudioSegment.from_file(out_wav_path,format="wav")
 
     mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
-    tar_audio = AudioSegment(tar_audio.tobytes(), frame_rate=daw_sample, sample_width=tar_audio.dtype.itemsize, channels=1)
+    tar_audio = AudioSegment.from_mono_audiosegmentstar(tar_audio)
 
     # 오디오 데이터 합치기
-    combined_audio = mr_audio.overlay(tar_audio)
+    combined_audio = mr_audio.overlay(tar_audio, positon=0)
 
     # MP3로 오디오를 내보내고, 바이트로 읽어옵니다
     audio_bytes = combined_audio.export(format='mp3').read()
@@ -632,7 +632,6 @@ def voice_change_model(request):
     # HTTP 응답 객체를 생성하고, 오디오 바이트를 content로 설정합니다
     # response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
-    # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
 
     return response
  
