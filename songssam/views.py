@@ -604,8 +604,11 @@ def voice_change_model(request):
     if enable_spk_id_cover:
         int_speak_id = spk_id
 
-    wav_read = AudioSegment.from_file(wav_data,format="wav")
-    input_wav_read=io.BytesIO(wav_read.read())
+    with open(wav_data, "rb") as file:
+        wav_data_bytes = file.read()
+
+    # 읽어온 데이터를 io.BytesIO 객체에 넣습니다
+    input_wav_read = io.BytesIO(wav_data_bytes)
     svc_model = SvcDDSP(pt_filename, use_vocoder_based_enhancer, enhancer_adaptive_key, select_pitch_extractor,
                         limit_f0_min, limit_f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover)
     
