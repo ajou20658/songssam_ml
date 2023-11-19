@@ -595,6 +595,7 @@ def voice_change_model(request):
         waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
 
         sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
+        wav_data.seek(0)
         logger.info("위 경로에 MR 저장완료")
     except Exception as e:
         error_message = str(e)
@@ -608,7 +609,7 @@ def voice_change_model(request):
     f_safe_prefix_pad_length = float(0)
     f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
-    daw_sample = int(0)
+    daw_sample = int(44100)
 
     if enable_spk_id_cover:
         int_speak_id = spk_id
@@ -618,10 +619,9 @@ def voice_change_model(request):
                         limit_f0_min, limit_f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover)
     
     
-    input_wav_read = io.BytesIO(wav_data)
 
     # 모델 추론
-    _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
+    _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
     # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
@@ -629,19 +629,20 @@ def voice_change_model(request):
     # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
-    out_wav_path.seek(0)
 
     # 오디오 파일을 mp3 형식으로 변환
     mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
-    audio_bytes = mp3.export(format='mp3').read()
+
+    
 
     # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
     y1,sample_rate1=librosa.load(MR_file_path,mono=True)
-    y2,sample_rate2=librosa.load(mp3,mono=True)
+    y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True)
     ip.display.Audio((y1+y2)/2, rate=int((sample_rate1+sample_rate2)/2))
 
-    os.remove("./"+out_wav_path)
+    audio_bytes = mp3.export(format='mp3').read()
+    # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
 
