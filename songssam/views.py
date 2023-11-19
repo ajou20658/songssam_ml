@@ -522,7 +522,7 @@ def voice_change_model(request):
     tmp_path = root+"/songssam/tmp"
 
     # 별도의 변수를 io.BytesIO 객체로 초기화(이후에 wav 데이터로 사용됨)
-    wav_data = io.BytesIO
+    wav_data = io.BytesIO()
 
     try:
         # 음성 변환에 필요한 매개변수 설정
