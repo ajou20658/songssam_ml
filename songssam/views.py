@@ -405,7 +405,8 @@ def voice_change_model(request):
     else:
         logger.info("serializer 오류")
         return JsonResponse({"error":"error"},status=404)
-
+    logger.info(f_wave_path)
+    logger.info(f_ptr_path)
     # 결과를 저장할 경로 생성
     if not os.path.exists("exp/"+str(uuid)):
         os.makedirs("exp/"+str(uuid))
