@@ -616,7 +616,7 @@ def voice_change_model(request):
     
 
     # 모델 추론
-    _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
+    _audio, _model_sr = svc_model.infer(wav_data.getvalue(), f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
     # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
@@ -624,11 +624,11 @@ def voice_change_model(request):
     # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_wav:
-        temp_wav.write(wav_data.getvalue())
-        temp_wav_path = temp_wav.name
+    # with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_wav:
+    #     temp_wav.write(wav_data.getvalue())
+    #     temp_wav_path = temp_wav.name
     # 오디오 파일을 mp3 형식으로 변환
-    mp3 = AudioSegment.from_file(temp_wav_path,format="wav")
+    mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
     audio_bytes =mp3.export(format='mp3').read()
     
