@@ -242,7 +242,7 @@ def inference(request):
             "cropsize" : 256,
             "postprocess" : 'store_true'
         })
-        gpu = 1
+        gpu = 0
         
         print('loading model...', end=' ')
         device = torch.device('cpu')
@@ -589,7 +589,6 @@ def voice_change_model(request):
     waveT = spec_utils.spectrogram_to_wave(v_spec, hop_length=args.hop_length)
 
     sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
-    logger.info("위 경로에 MR 저장완료")
    
     
     pt_filename = tmp_path+"/Voice.pt"
@@ -605,16 +604,16 @@ def voice_change_model(request):
     if enable_spk_id_cover:
         int_speak_id = spk_id
 
-    
+    input_wav_read = AudioSegment.from_file(wav_data,format="wav")
     svc_model = SvcDDSP(pt_filename, use_vocoder_based_enhancer, enhancer_adaptive_key, select_pitch_extractor,
                         limit_f0_min, limit_f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover)
     
     
     # 모델 추론
-    _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
+    _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
     # 오디오 재샘플링
-    tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
+    tar_audio = librosa.resample(_audio, _model_sr, daw_sample)
     
     # 반환할 오디오 파일 작성
     # out_wav_path = tmp_path+"/generated.wav"
@@ -622,10 +621,10 @@ def voice_change_model(request):
     # mp3 = AudioSegment.from_file(out_wav_path,format="wav")
 
     mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
-    tar_audio = AudioSegment(tar_audio.tobytes(), frame_rate=daw_sample, sample_width=tar_audio.dtype.itemsize, channels=len(tar_audio.shape))
+    tar_audio = AudioSegment(tar_audio.tobytes(), frame_rate=daw_sample, sample_width=tar_audio.dtype.itemsize, channels=1)
 
     # 오디오 데이터 합치기
-    combined_audio = mr_audio + tar_audio
+    combined_audio = mr_audio.overlay(tar_audio)
 
     # MP3로 오디오를 내보내고, 바이트로 읽어옵니다
     audio_bytes = combined_audio.export(format='mp3').read()
