@@ -9,7 +9,7 @@ import torchcrepe
 import resampy
 from transformers import HubertModel, Wav2Vec2FeatureExtractor
 from fairseq import checkpoint_utils
-from encoder.hubert.model import HubertSoft
+from ..encoder.hubert.model import HubertSoft
 from torch.nn.modules.utils import consume_prefix_in_state_dict_if_present
 from torchaudio.transforms import Resample
 from .unit2control import Unit2Control

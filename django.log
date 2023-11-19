@@ -2322,3 +2322,523 @@ model done
 module 'soundfile' has no attribute 'SoundFileRuntimeError'
 Length Required: /songssam/post/
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+generated new fontManager
+Not Found: /
+Not Found: /
+Not Found: /*
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /*
+model done
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+3
+complex64
+MR loading...
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/Mr.wav
+위 경로에 MR 저장완료
+보컬 loading...
+위 경로에 MR 저장완료
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/0.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/1.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/2.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/3.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/4.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/5.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/6.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/7.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/8.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/9.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/10.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/11.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/12.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/13.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/14.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/15.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/16.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/17.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/18.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/19.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/20.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/21.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/22.wav
+split complete
+23
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0
+['1.wav', '10.wav', '11.wav', '12.wav', '13.wav', '14.wav', '15.wav', '16.wav', '17.wav', '18.wav', '19.wav', '2.wav', '20.wav', '3.wav', '4.wav', '5.wav', '6.wav', '7.wav', '8.wav', '9.wav']
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/1.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/10.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/11.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/12.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/13.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/14.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/15.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/16.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/17.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/18.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/19.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/2.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/20.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/3.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/4.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/5.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/6.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/7.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/8.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/9.wav.npy
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/14.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/15.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/13.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/18.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/16.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/20.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/10.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/6.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/7.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/4.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/2.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/17.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/19.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/11.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/1.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/9.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/8.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/3.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/5.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/12.wav
+압축 완료 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/compressed.7z
+압축파일 생성완료
+vocal압축파일 aws업로드 완료
+f0압축파일 aws업로드 완료
+tmp폴더 비우기
+[{"f0_1":211,"f0_2":415,"f0_3":543,"f0_4":493,"f0_5":363,"f0_6":176,"f0_7":245,"f0_8":459}]
+Not Found: /
+Not Found: /
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+[Errno 5] Input/output error
+Length Required: /songssam/splitter/
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+3
+complex64
+MR loading...
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/Mr.wav
+위 경로에 MR 저장완료
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+3
+complex64
+MR loading...
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/Mr.wav
+위 경로에 MR 저장완료
+보컬 loading...
+위 경로에 MR 저장완료
+folder already exists
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/0.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/1.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/2.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/3.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/4.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/5.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/6.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/7.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/8.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/9.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/10.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/11.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/12.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/13.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/14.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/15.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/16.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/17.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/18.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/19.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/20.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/21.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/22.wav
+split complete
+23
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0
+['1.wav', '10.wav', '11.wav', '12.wav', '13.wav', '14.wav', '15.wav', '16.wav', '17.wav', '18.wav', '19.wav', '2.wav', '20.wav', '3.wav', '4.wav', '5.wav', '6.wav', '7.wav', '8.wav', '9.wav']
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/1.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/10.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/11.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/12.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/13.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/14.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/15.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/16.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/17.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/18.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/19.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/2.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/20.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/3.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/4.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/5.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/6.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/7.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/8.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/9.wav.npy
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/14.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/15.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/13.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/18.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/16.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/20.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/10.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/6.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/7.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/4.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/2.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/17.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/19.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/11.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/1.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/9.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/8.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/3.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/5.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/12.wav
+압축 완료 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/compressed.7z
+압축파일 생성완료
+vocal압축파일 aws업로드 완료
+f0압축파일 aws업로드 완료
+tmp폴더 비우기
+[{"f0_1":176,"f0_2":459,"f0_3":543,"f0_4":245,"f0_5":363,"f0_6":493,"f0_7":211,"f0_8":414}]
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+3
+complex64
+MR loading...
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/Mr.wav
+위 경로에 MR 저장완료
+보컬 loading...
+위 경로에 MR 저장완료
+folder already exists
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/0.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/1.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/2.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/3.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/4.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/5.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/6.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/7.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/8.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/9.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/10.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/11.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/12.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/13.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/14.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/15.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/16.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/17.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/18.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/19.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/20.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/21.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/22.wav
+split complete
+23
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0
+['1.wav', '10.wav', '11.wav', '12.wav', '13.wav', '14.wav', '15.wav', '16.wav', '17.wav', '18.wav', '19.wav', '2.wav', '20.wav', '3.wav', '4.wav', '5.wav', '6.wav', '7.wav', '8.wav', '9.wav']
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/1.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/10.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/11.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/12.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/13.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/14.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/15.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/16.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/17.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/18.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/19.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/2.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/20.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/3.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/4.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/5.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/6.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/7.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/8.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/9.wav.npy
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/14.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/15.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/13.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/18.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/16.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/20.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/10.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/6.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/7.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/4.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/2.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/17.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/19.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/11.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/1.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/9.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/8.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/3.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/5.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/12.wav
+압축 완료 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/compressed.7z
+압축파일 생성완료
+vocal압축파일 aws업로드 완료
+f0압축파일 aws업로드 완료
+tmp폴더 비우기
+[{"f0_1":211,"f0_2":414,"f0_3":543,"f0_4":493,"f0_5":363,"f0_6":176,"f0_7":245,"f0_8":459}]
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+folder already exists
+model done
+2
+Audio file with ID3 version 2.4.0, contains:MPEG ADTS, layer III, v1, 128 kbps, 44.1 kHz, Stereo
+Type Err
+complex64
+3
+complex64
+MR loading...
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/Mr.wav
+위 경로에 MR 저장완료
+보컬 loading...
+위 경로에 MR 저장완료
+folder already exists
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/0.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/1.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/2.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/3.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/4.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/5.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/6.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/7.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/8.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/9.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/10.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/11.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/12.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/13.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/14.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/15.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/16.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/17.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/18.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/19.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/20.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/21.wav
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/raw/22.wav
+split complete
+23
+folder already exists
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio
+/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0
+['1.wav', '10.wav', '11.wav', '12.wav', '13.wav', '14.wav', '15.wav', '16.wav', '17.wav', '18.wav', '19.wav', '2.wav', '20.wav', '3.wav', '4.wav', '5.wav', '6.wav', '7.wav', '8.wav', '9.wav']
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/1.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/10.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/11.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/12.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/13.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/14.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/15.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/16.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/17.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/18.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/19.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/2.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/20.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/3.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/4.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/5.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/6.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/7.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/8.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/f0/9.wav.npy
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/14.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/15.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/13.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/18.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/16.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/20.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/10.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/6.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/7.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/4.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/2.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/17.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/19.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/11.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/1.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/9.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/8.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/3.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/5.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/audio/12.wav
+압축 완료 : /home/ubuntu/songssam_ml/songssam/tmp/32a8cb94-705c-4d06-b8ac-ca0106fd0fa6/compressed.7z
+압축파일 생성완료
+vocal압축파일 aws업로드 완료
+f0압축파일 aws업로드 완료
+tmp폴더 비우기
+[{"f0_1":459,"f0_2":211,"f0_3":543,"f0_4":363,"f0_5":176,"f0_6":245,"f0_7":415,"f0_8":493}]
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a
+Not Found: /voiceChangeModel?wav_path=origin/00257f5b-f9b3-452b-b119-065602643b4a&fPtrPath=ptr/d51a7135-179e-495b-a947-e09cb7f0f568&uuid=00257f5b-f9b3-452b-b119-065602643b4a&fSafePrefixPadLength=&fPitchChange=&sSpeakId=&sampleRate=
+Not Found: /voiceChangeModel
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /*
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /boaform/admin/formLogin
+Not Found: /
+Not Found: /favicon.ico
+Not Found: /
+Not Found: /
+Not Found: /favicon.ico
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /favicon.ico
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Internal Server Error: /songssam/splitter/
+Traceback (most recent call last):
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/rest_framework/decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/songssam_ml/songssam/views.py", line 232, in inference
+    s3.download_file(bucket,fileKey,filename)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/boto3/s3/inject.py", line 190, in download_file
+    return transfer.download_file(
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/boto3/s3/transfer.py", line 326, in download_file
+    future.result()
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/s3transfer/futures.py", line 103, in result
+    return self._coordinator.result()
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/s3transfer/futures.py", line 266, in result
+    raise self._exception
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/s3transfer/tasks.py", line 269, in _main
+    self._submit(transfer_future=transfer_future, **kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/s3transfer/download.py", line 354, in _submit
+    response = client.head_object(
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/botocore/client.py", line 535, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/home/ubuntu/venv/lib/python3.8/site-packages/botocore/client.py", line 980, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (404) when calling the HeadObject operation: Not Found
+Watching for file changes with StatReloader
+folder already exists
+model done
+model done
+2
+WebM
+Type Err
+complex64
+2
+WebM
+Type Err
+complex64
+3
+complex64
+보컬 loading...
+3
+complex64
+보컬 loading...
+위 경로에 MR 저장완료
+위 경로에 MR 저장완료
+[Errno 2] No such file or directory: '/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/mp3'
+/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/raw/0.wav
+/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/raw/1.wav
+split complete
+2
+Length Required: /songssam/splitter/
+/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/audio
+/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/f0
+['1.wav', '2.wav']
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/f0/1.wav.npy
+이곳에 저장 : /home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/f0/2.wav.npy
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/audio/2.wav
+이 파일을 압축/home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/audio/1.wav
+압축 완료 : /home/ubuntu/songssam_ml/songssam/tmp/9bfbc9c6-c2eb-41e8-9f4a-15d60bd1677f/compressed.7z
+압축파일 생성완료
+vocal압축파일 aws업로드 완료
+f0압축파일 aws업로드 완료
+tmp폴더 비우기
+[{"f0_1":422,"f0_2":116,"f0_3":543,"f0_4":185,"f0_5":308,"f0_6":374,"f0_7":501,"f0_8":141}]
