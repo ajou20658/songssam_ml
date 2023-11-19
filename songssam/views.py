@@ -641,15 +641,17 @@ def voice_change_model(request):
     logger.info(sample_rate1)
     y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True)
     logger.info(sample_rate2)
-    ip.display.Audio((y1+y2)/2, rate=int((sample_rate1+sample_rate2)/2))
+    
     y1 = librosa.resample(y1,sample_rate1,sample_rate2)
 
     min_len=min(len(y1),len(y2))
     y1 = y1[:min_len]
     y2 = y2[:min_len]
 
-    ip.display.Audio((y1 + y2) / 2, rate=int((sample_rate1 + sample_rate2) / 2))
-    audio_bytes = mp3.export(format='mp3').read()
+    # ip.display.Audio((y1 + y2) / 2, rate=int((sample_rate1 + sample_rate2) / 2))
+    mixed_audio = AudioSegment.from_mono_audiosegments(AudioSegment(y1),AudioSegment(y2))
+    audio_bytes = mixed_audio.export(format='mp3').read()
+    
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
