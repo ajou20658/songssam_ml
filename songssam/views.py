@@ -622,7 +622,7 @@ def voice_change_model(request):
 
     # 모델 추론
     _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
-    logger.info("모델 sr"+_model_sr)
+    
     # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
     
@@ -649,8 +649,22 @@ def voice_change_model(request):
     y1 = y1[:min_len]
     y2 = y2[:min_len]
 
-    # ip.display.Audio((y1 + y2) / 2, rate=int((sample_rate1 + sample_rate2) / 2))
-    mixed_audio = AudioSegment.from_mono_audiosegments(AudioSegment(y1),AudioSegment(y2))
+    with NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile1, NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile2:
+        sf.write(tmpfile1.name, y1, sample_rate1, subtype='PCM_16', format='WAV')
+        sf.write(tmpfile2.name, y2, sample_rate2, subtype='PCM_16', format='WAV')
+
+        # Create AudioSegment instances from the temporary WAV files
+        audio_segment1 = AudioSegment.from_file(tmpfile1.name, format="wav")
+        audio_segment2 = AudioSegment.from_file(tmpfile2.name, format="wav")
+
+        # Mix the audio segments
+        mixed_audio = audio_segment1 + audio_segment2
+
+    # Remove the temporary WAV files
+    os.remove(tmpfile1.name)
+    os.remove(tmpfile2.name)
+
+    # Export the mixed audio to MP3
     audio_bytes = mixed_audio.export(format='mp3').read()
     
     # os.remove("./"+out_wav_path)
