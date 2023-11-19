@@ -625,8 +625,8 @@ def voice_change_model(request):
     min_len=min(len(y1),len(tar_audio))
     y1 = y1[:min_len]
     tar_audio = tar_audio[:min_len]
-
-    audio_bytes =librosa.output.to_bytes(tar_audio,sr=daw_sample,format="mp3")
+    audio = AudioSegment(tar_audio.tobytes(),frame_rate = daw_sample,sample_width=tar_audio.dtype.itemsize,channels=len(tar_audio.shape))
+    audio_bytes = audio.export(format='mp3').read()
     
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
