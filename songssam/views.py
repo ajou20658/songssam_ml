@@ -599,22 +599,18 @@ def voice_change_model(request):
     pt_filename = "exp/"+str(uuid)+".pt"
     # S3에서 .pt 파일 다운로드
     s3.download_file(bucket,f_ptr_path,pt_filename)
-
     # 변조 정보 설정
     f_safe_prefix_pad_length = float(0)
     f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
     daw_sample = int(44100)
-
     if enable_spk_id_cover:
         int_speak_id = spk_id
-
     
     svc_model = SvcDDSP(pt_filename, use_vocoder_based_enhancer, enhancer_adaptive_key, select_pitch_extractor,
                         limit_f0_min, limit_f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover)
     
     
-
     # 모델 추론
     _audio, _model_sr = svc_model.infer(wav_data.getvalue(), f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     
@@ -624,46 +620,33 @@ def voice_change_model(request):
     # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
-    # with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_wav:
-    #     temp_wav.write(wav_data.getvalue())
-    #     temp_wav_path = temp_wav.name
+
     # 오디오 파일을 mp3 형식으로 변환
     mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
-    audio_bytes =mp3.export(format='mp3').read()
     
-
-    # # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
-    # y1,sample_rate1=librosa.load(MR_file_path,mono=True)
-    # logger.info(sample_rate1)
-
-    # y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True,sr=sample_rate1)
-    # logger.info(sample_rate2)
+    # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
+    y1,sample_rate1=librosa.load(MR_file_path,mono=True)
+    logger.info(sample_rate1)
+    y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True,sr=sample_rate1)
+    logger.info(sample_rate2)
     
-    # # y1 = librosa.resample(y1,sample_rate1,sample_rate2)
-
-    # min_len=min(len(y1),len(y2))
-    # y1 = y1[:min_len]
-    # y2 = y2[:min_len]
-
-    # mixed_audio = (y1+y2)/2
-    # mixed_audio_segment = AudioSegment(
-    #     mixed_audio.tobytes(),
-    #     frame_rate=int((sample_rate1+sample_rate2)/2),
-    #     sample_width=mixed_audio.dtype.itemsize,
-    #     channels=1
-    # )
+    # y1 = librosa.resample(y1,sample_rate1,sample_rate2)
+    min_len=min(len(y1),len(y2))
+    y1 = y1[:min_len]
+    y2 = y2[:min_len]
+    mixed = (y1+y2)/2
+    audio_bytes = mixed.export(format='mp3').read()
+    # # Remove the temporary WAV files
+    # os.remove(tmpfile1.name)
+    # os.remove(tmpfile2.name)
     # # Export the mixed audio to MP3
-    # output_buffer = io.BytesIO()
-    # mixed_audio_segment.export(output_buffer, format='mp3')
+    # audio_bytes = mixed_audio.export(format='mp3').read()
 
-    # # 결과를 바이트로 얻기
-    # audio_bytes = output_buffer.getvalue()
     
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
-
     return response
  
 
