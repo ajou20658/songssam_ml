@@ -6,5 +6,5 @@ from .views import voice_change_model
 urlpatterns = [
     path('splitter/',inference),
     path('opencheck/',opencheck),
-    path('voiceChangeModel',voice_change_model)
+    path('voiceChangeModel/',voice_change_model)
 ]
