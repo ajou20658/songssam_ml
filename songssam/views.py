@@ -461,12 +461,12 @@ class SvcDDSP:
             output *= mask
             if self.vocoder_based_enhancer:
                 output, output_sample_rate = self.enhancer.enhance(
-                                                                output, 
-                                                                self.args.data.sampling_rate, 
-                                                                f0, 
-                                                                self.args.data.block_size,
-                                                                adaptive_key = self.enhancer_adaptive_key,
-                                                                silence_front = silence_front)
+                    output, 
+                    self.args.data.sampling_rate, 
+                    f0, 
+                    self.args.data.block_size,
+                    adaptive_key = self.enhancer_adaptive_key,
+                    silence_front = silence_front)
             else:
                 output_sample_rate = self.args.data.sampling_rate
 
@@ -658,7 +658,7 @@ def voice_change_model(request):
         audio_segment2 = AudioSegment.from_file(tmpfile2.name, format="wav")
 
         # Mix the audio segments
-        mixed_audio = audio_segment1 + audio_segment2
+        mixed_audio = AudioSegment.from_mono_audiosegments(AudioSegment(y1), AudioSegment(y2))
 
     # Remove the temporary WAV files
     os.remove(tmpfile1.name)
