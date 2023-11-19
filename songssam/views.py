@@ -558,7 +558,7 @@ def voice_change_model(request):
 
         # mp3 파일 로드
         X, sr = librosa.load(
-            mp3_filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+            mp3_filename, sr=args.sr, mono=True, dtype=np.float32, res_type='kaiser_fast')
         
         # 모노 오디오를 스테레오로 변환
         if X.ndim == 1:
@@ -622,7 +622,7 @@ def voice_change_model(request):
 
     # 모델 추론
     _audio, _model_sr = svc_model.infer(wav_data, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
-    
+    logger.info("모델 sr"+_model_sr)
     # 오디오 재샘플링
     tar_audio = librosa.resample(_audio, orig_sr=_model_sr, target_sr=daw_sample)
     
@@ -638,9 +638,17 @@ def voice_change_model(request):
 
     # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
     y1,sample_rate1=librosa.load(MR_file_path,mono=True)
+    logger.info(sample_rate1)
     y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True)
+    logger.info(sample_rate2)
     ip.display.Audio((y1+y2)/2, rate=int((sample_rate1+sample_rate2)/2))
+    y1 = librosa.resample(y1,sample_rate1,sample_rate2)
 
+    min_len=min(len(y1),len(y2))
+    y1 = y1[:min_len]
+    y2 = y2[:min_len]
+
+    ip.display.Audio((y1 + y2) / 2, rate=int((sample_rate1 + sample_rate2) / 2))
     audio_bytes = mp3.export(format='mp3').read()
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
