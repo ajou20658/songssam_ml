@@ -599,7 +599,7 @@ def voice_change_model(request):
     f_safe_prefix_pad_length = float(0)
     f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
-    daw_sample = float(44100)
+    daw_sample = int(44100)
 
     if enable_spk_id_cover:
         int_speak_id = spk_id
@@ -616,8 +616,8 @@ def voice_change_model(request):
     logger.info('생성 완료 loading...')
     tar_audio = librosa.resample(_audio, orig_sr =_model_sr, target_sr=daw_sample)
     generated_path = tmp_path+"/gen.wav"
-    sf.write(generated_path, tar_audio, daw_sample, format="wav")
-
+    sf.write(generated_path, tar_audio, samplerate=daw_sample, format="wav")
+# sf.write(wav_data,waveT.T,sr,subtype = 'PCM_16',format='WAV')
     mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
     gen_audio = AudioSegment.from_file(generated_path, format="wav")
     combined_audio = mr_audio.overlay(gen_audio, position=0)
