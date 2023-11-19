@@ -649,17 +649,12 @@ def voice_change_model(request):
     y1 = y1[:min_len]
     y2 = y2[:min_len]
 
-    emphasized_y1 = librosa.effects.preemphasis(y1)
-    emphasized_y2 = librosa.effects.preemphasis(y2)
 
     # 주파수 합치기
-    merged_spectrum = emphasized_y1 + emphasized_y2
-
-    # librosa에서 반대로 작동하므로 다시 반전시킴
-    merged_signal = librosa.effects.preemphasis(merged_spectrum, coef=-1)
+    merged_spectrum = y1 + y2
 
     # numpy 배열을 PyDub의 AudioSegment로 변환
-    merged_audio = AudioSegment(merged_signal.tobytes(), frame_rate=sample_rate1, sample_width=merged_signal.dtype.itemsize, channels=1)
+    merged_audio = AudioSegment(merged_spectrum.tobytes(), frame_rate=sample_rate1, sample_width=merged_signal.dtype.itemsize, channels=1)
 
     # Export the mixed audio to MP3
     audio_bytes = merged_audio.export(format='mp3').read()
