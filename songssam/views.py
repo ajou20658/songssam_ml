@@ -510,7 +510,7 @@ def voice_change_model(request):
     
 
     root = os.path.abspath('.')
-    tmp_path = root+"/songssam/tmp"
+    tmp_path = root+"/songssam/tmp2"
     mp3_filename = tmp_path+"/Origin.mp3"
 
     # S3에서 파일 다운로드
