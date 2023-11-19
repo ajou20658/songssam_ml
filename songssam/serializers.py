@@ -24,7 +24,7 @@ class InferSerializer(serializers.Serializer):
         return Inference(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.fileKey = validated_data.get('fileKey', instance.fileKey)
-        instance.isUser = validated_data.get('isUser', instance.isUser)
+        instance.wav_path = validated_data.get('wav_path', instance.wav_path)
+        instance.fPtrPath = validated_data.get('fPtrPath', instance.fPtrPath)
         instance.uuid = validated_data.get('uuid',instance.uuid)
         return instance
