@@ -633,35 +633,35 @@ def voice_change_model(request):
     # 오디오 파일을 mp3 형식으로 변환
     mp3 = AudioSegment.from_file(out_wav_path,format="wav")
     os.remove("./"+pt_filename)
-
+    audio_bytes =mp3.export(format='mp3').read()
     
 
-    # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
-    y1,sample_rate1=librosa.load(MR_file_path,mono=True)
-    logger.info(sample_rate1)
+    # # MP3 파일과 MR 파일을 불러와서 오디오를 섞음
+    # y1,sample_rate1=librosa.load(MR_file_path,mono=True)
+    # logger.info(sample_rate1)
 
-    y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True,sr=sample_rate1)
-    logger.info(sample_rate2)
+    # y2,sample_rate2=librosa.load(io.BytesIO(mp3.export(format='wav').read()),mono=True,sr=sample_rate1)
+    # logger.info(sample_rate2)
     
-    # y1 = librosa.resample(y1,sample_rate1,sample_rate2)
+    # # y1 = librosa.resample(y1,sample_rate1,sample_rate2)
 
-    min_len=min(len(y1),len(y2))
-    y1 = y1[:min_len]
-    y2 = y2[:min_len]
+    # min_len=min(len(y1),len(y2))
+    # y1 = y1[:min_len]
+    # y2 = y2[:min_len]
 
-    mixed_audio = (y1+y2)/2
-    mixed_audio_segment = AudioSegment(
-        mixed_audio.tobytes(),
-        frame_rate=int((sample_rate1+sample_rate2)/2),
-        sample_width=mixed_audio.dtype.itemsize,
-        channels=1
-    )
-    # Export the mixed audio to MP3
-    output_buffer = io.BytesIO()
-    mixed_audio_segment.export(output_buffer, format='mp3')
+    # mixed_audio = (y1+y2)/2
+    # mixed_audio_segment = AudioSegment(
+    #     mixed_audio.tobytes(),
+    #     frame_rate=int((sample_rate1+sample_rate2)/2),
+    #     sample_width=mixed_audio.dtype.itemsize,
+    #     channels=1
+    # )
+    # # Export the mixed audio to MP3
+    # output_buffer = io.BytesIO()
+    # mixed_audio_segment.export(output_buffer, format='mp3')
 
-    # 결과를 바이트로 얻기
-    audio_bytes = output_buffer.getvalue()
+    # # 결과를 바이트로 얻기
+    # audio_bytes = output_buffer.getvalue()
     
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
