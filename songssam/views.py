@@ -390,10 +390,11 @@ enable_spk_id_cover = True
 
 spk_mix_dict = None
 
-# @app.route("/voiceChangeModel", methods=["GET"])
+
+@csrf_exempt
 @api_view(['GET'])
 def voice_change_model(request):
-    serializer = InferSerializer(data= request.data)
+    serializer = InferSerializer(data= request.query_params)
     if serializer.is_valid():
         f_wave_path = serializer.validated_data["wav_path"]
         f_ptr_path = serializer.validated_data["fPtrPath"]
