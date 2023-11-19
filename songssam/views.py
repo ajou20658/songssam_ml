@@ -621,13 +621,17 @@ def voice_change_model(request):
     # sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
     # mp3 = AudioSegment.from_file(out_wav_path,format="wav")
 
-    y1,sample_rate1=librosa.load(MR_file_path,mono=True,sr=daw_sample)
-    min_len=min(len(y1),len(tar_audio))
-    y1 = y1[:min_len]
-    tar_audio = tar_audio[:min_len]
-    audio = AudioSegment(y1.tobytes(),frame_rate = daw_sample,sample_width=tar_audio.dtype.itemsize,channels=len(tar_audio.shape))
-    audio_bytes = audio.export(format='mp3').read()
-    
+    mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
+    tar_audio = AudioSegment(tar_audio.tobytes(), frame_rate=daw_sample, sample_width=tar_audio.dtype.itemsize, channels=len(tar_audio.shape))
+
+    # 오디오 데이터 합치기
+    combined_audio = mr_audio + tar_audio
+
+    # MP3로 오디오를 내보내고, 바이트로 읽어옵니다
+    audio_bytes = combined_audio.export(format='mp3').read()
+
+    # HTTP 응답 객체를 생성하고, 오디오 바이트를 content로 설정합니다
+    # response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
     # response['Content-Disposition'] = 'attachment; filename="audio.mp3"'  # 파일을 다운로드할 수 있도록 설정
 
