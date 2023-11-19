@@ -649,15 +649,19 @@ def voice_change_model(request):
     y1 = y1[:min_len]
     y2 = y2[:min_len]
 
-
-    # 주파수 합치기
-    merged_spectrum = y1 + y2
-
-    # numpy 배열을 PyDub의 AudioSegment로 변환
-    merged_audio = AudioSegment(merged_spectrum.tobytes(), frame_rate=sample_rate1, sample_width=y1.dtype.itemsize, channels=1)
-
+    mixed_audio = (y1+y2)/2
+    mixed_audio_segment = AudioSegment(
+        mixed_audio.tobytes(),
+        frame_rate=int((sample_rate1+sample_rate2)/2),
+        sample_width=mixed_audio.dtype.itemsize,
+        channels=1
+    )
     # Export the mixed audio to MP3
-    audio_bytes = merged_audio.export(format='mp3').read()
+    output_buffer = io.BytesIO()
+    mixed_audio_segment.export(output_buffer, format='mp3')
+
+    # 결과를 바이트로 얻기
+    audio_bytes = output_buffer.getvalue()
     
     # os.remove("./"+out_wav_path)
     response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
