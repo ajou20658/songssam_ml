@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from tqdm import tqdm
 from pydub import AudioSegment
 from tempfile import NamedTemporaryFile
+import tempfile
 
 from .f0_extractor import start_F0_Extractor, concatnator, f0_feature, extract_centroid
 
@@ -32,7 +33,6 @@ import torch
 import boto3
 import logging
 import audioread
-import IPython as ip
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -242,24 +242,19 @@ def inference(request):
             "cropsize" : 256,
             "postprocess" : 'store_true'
         })
-        gpu = 0
+        gpu = 1
         
         print('loading model...', end=' ')
+        device = torch.device('cpu')
         model = nets.CascadedNet(args.n_fft, 32, 128)
-        model.load_state_dict(torch.load(args.pretrained_model))
-
-
-        if torch.cuda.is_available():
-            device = torch.device('cuda')
-            if torch.cuda.device_count() > 1:
-                model = torch.nn.DataParallel(model)
-            model.to(device)
-        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-            device = torch.device('mps')
-            model.to(device)
-        else:
-            device = torch.device('cpu')
-            model.to(device)
+        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+        if gpu >= 0:
+            if torch.cuda.is_available():
+                device = torch.device('cuda:{}'.format(gpu))
+                model.to(device)
+            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+                device = torch.device('mps')
+                model.to(device)
 
         logger.info('model done')
 
@@ -541,18 +536,19 @@ def voice_change_model(request):
         model = nets.CascadedNet(args.n_fft, 32, 128)
         model.load_state_dict(torch.load(args.pretrained_model))
 
-        # 모델을 사용 가능한 디바이스에 할당
-        if torch.cuda.is_available():
-            device = torch.device('cuda')
-            if torch.cuda.device_count() > 1:
-                model = torch.nn.DataParallel(model)
-            model.to(device)
-        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-            device = torch.device('mps')
-            model.to(device)
-        else:
-            device = torch.device('cpu')
-            model.to(device)
+        gpu = 1
+        
+        print('loading model...', end=' ')
+        device = torch.device('cpu')
+        model = nets.CascadedNet(args.n_fft, 32, 128)
+        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+        if gpu >= 0:
+            if torch.cuda.is_available():
+                device = torch.device('cuda:{}'.format(gpu))
+                model.to(device)
+            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+                device = torch.device('mps')
+                model.to(device)
 
         logger.info('model done')
 
@@ -608,7 +604,7 @@ def voice_change_model(request):
     f_safe_prefix_pad_length = float(0)
     f_pitch_change = float(0) #키값 변경
     int_speak_id = int(0)
-    daw_sample = int(0)
+    daw_sample = int(44100)
 
     if enable_spk_id_cover:
         int_speak_id = spk_id
@@ -628,9 +624,11 @@ def voice_change_model(request):
     # 반환할 오디오 파일 작성
     out_wav_path = io.BytesIO()
     sf.write(out_wav_path, tar_audio, daw_sample, format="wav")
-
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_wav:
+        temp_wav.write(wav_data.getvalue())
+        temp_wav_path = temp_wav.name
     # 오디오 파일을 mp3 형식으로 변환
-    mp3 = AudioSegment.from_file(wav_data,format="wav")
+    mp3 = AudioSegment.from_file(temp_wav_path,format="wav")
     os.remove("./"+pt_filename)
     audio_bytes =mp3.export(format='mp3').read()
     
