@@ -39,7 +39,114 @@ logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ22ODM76PP',aws_secret_access_key='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')
 bucket = "songssam.site"
 
+args = easydict.EasyDict({
+        "pretrained_model" : root+'/songssam/models/baseline.pth',
+        "sr" : 44100,
+        "n_fft" : 2048,
+        "hop_length" : 1024,
+        "batchsize" : 4,
+        "cropsize" : 256,
+        "postprocess" : 'store_true'
+    })
+    
+class SvcDDSP:
+    def __init__(self, model_path, vocoder_based_enhancer, enhancer_adaptive_key, input_pitch_extractor,
+                 f0_min, f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover):
+        self.model_path = model_path
+        self.vocoder_based_enhancer = vocoder_based_enhancer
+        self.enhancer_adaptive_key = enhancer_adaptive_key
+        self.input_pitch_extractor = input_pitch_extractor
+        self.f0_min = f0_min
+        self.f0_max = f0_max
+        self.threhold = threhold
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.spk_id = spk_id
+        self.spk_mix_dict = spk_mix_dict
+        self.enable_spk_id_cover = enable_spk_id_cover
+        
+        # load ddsp model
+        self.model, self.args = load_model(self.model_path, device=self.device)
+        
+        # load units encoder
+        if self.args.data.encoder == 'cnhubertsoftfish':
+            cnhubertsoft_gate = self.args.data.cnhubertsoft_gate
+        else:
+            cnhubertsoft_gate = 10
+        self.units_encoder = Units_Encoder(
+            self.args.data.encoder,
+            self.args.data.encoder_ckpt,
+            self.args.data.encoder_sample_rate,
+            self.args.data.encoder_hop_size,
+            cnhubertsoft_gate=cnhubertsoft_gate,
+            device=self.device)
+        
+        # load enhancer
+        if self.vocoder_based_enhancer:
+            self.enhancer = Enhancer(self.args.enhancer.type, self.args.enhancer.ckpt, device=self.device)
 
+    def infer(self, input_wav, pitch_adjust, speaker_id, safe_prefix_pad_length):
+        print("Infer!")
+        # load input
+        audio, sample_rate = librosa.load(input_wav, sr=None, mono=True)
+        if len(audio.shape) > 1:
+            audio = librosa.to_mono(audio)
+        hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
+        
+        # safe front silence
+        if safe_prefix_pad_length > 0.03:
+            silence_front = safe_prefix_pad_length - 0.03
+        else:
+            silence_front = 0
+            
+        # extract f0
+        pitch_extractor = F0_Extractor(
+            self.input_pitch_extractor,
+            sample_rate,
+            hop_size,
+            float(self.f0_min),
+            float(self.f0_max))
+        f0 = pitch_extractor.extract(audio, uv_interp=True, device=self.device, silence_front=silence_front)
+        f0 = torch.from_numpy(f0).float().to(self.device).unsqueeze(-1).unsqueeze(0)
+        f0 = f0 * 2 ** (float(pitch_adjust) / 12)
+        
+        # extract volume
+        volume_extractor = Volume_Extractor(hop_size)
+        volume = volume_extractor.extract(audio)
+        mask = (volume > 10 ** (float(self.threhold) / 20)).astype('float')
+        mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
+        mask = np.array([np.max(mask[n : n + 9]) for n in range(len(mask) - 8)])
+        mask = torch.from_numpy(mask).float().to(self.device).unsqueeze(-1).unsqueeze(0)
+        mask = upsample(mask, self.args.data.block_size).squeeze(-1)
+        volume = torch.from_numpy(volume).float().to(self.device).unsqueeze(-1).unsqueeze(0)
+
+        # extract units
+        audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
+        units = self.units_encoder.encode(audio_t, sample_rate, hop_size)
+        
+        # spk_id or spk_mix_dict
+        if self.enable_spk_id_cover:
+            spk_id = self.spk_id
+        else:
+            spk_id = speaker_id
+        spk_id = torch.LongTensor(np.array([[spk_id]])).to(self.device)
+        
+        # forward and return the output
+        with torch.no_grad():
+            output, _, (s_h, s_n) = self.model(units, f0, volume, spk_id = spk_id, spk_mix_dict = self.spk_mix_dict)
+            output *= mask
+            if self.vocoder_based_enhancer:
+                output, output_sample_rate = self.enhancer.enhance(
+                    output, 
+                    self.args.data.sampling_rate, 
+                    f0, 
+                    self.args.data.block_size,
+                    adaptive_key = self.enhancer_adaptive_key,
+                    silence_front = silence_front)
+            else:
+                output_sample_rate = self.args.data.sampling_rate
+
+            output = output.squeeze().cpu().numpy()
+            return output, output_sample_rate
 class Separator(object):
     def __init__(self, model, device, batchsize, cropsize, postprocess=False):
         self.model = model
@@ -210,6 +317,30 @@ def load_audio_file(file_path, target_sr=None):
             audio_data.append(frame)
     return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
 
+def vocal_removal(filename):
+    root = os.path.abspath('.')
+
+    gpu = 0
+    
+    print('loading model...', end=' ')
+    device = torch.device('cpu')
+    model = nets.CascadedNet(args.n_fft, 32, 128)
+    model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
+    if gpu >= 0:
+        if torch.cuda.is_available():
+            device = torch.device('cuda:{}'.format(gpu))
+            model.to(device)
+        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            device = torch.device('mps')
+            model.to(device)
+    X, sr = librosa.load(
+            filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
+        
+    sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
+    X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
+    y_spec, v_spec = sp.separate_tta(X_spec)
+    return y_spec,v_spec
+
 @csrf_exempt
 @api_view(['POST'])
 def inference(request):
@@ -233,34 +364,7 @@ def inference(request):
     try:
         
         # input_resource = wave.open(filename,'rb')
-        args = easydict.EasyDict({
-            "pretrained_model" : root+'/songssam/models/baseline.pth',
-            "sr" : 44100,
-            "n_fft" : 2048,
-            "hop_length" : 1024,
-            "batchsize" : 4,
-            "cropsize" : 256,
-            "postprocess" : 'store_true'
-        })
-        gpu = 0
-        
-        print('loading model...', end=' ')
-        device = torch.device('cpu')
-        model = nets.CascadedNet(args.n_fft, 32, 128)
-        model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
-        if gpu >= 0:
-            if torch.cuda.is_available():
-                device = torch.device('cuda:{}'.format(gpu))
-                model.to(device)
-            elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-                device = torch.device('mps')
-                model.to(device)
 
-        logger.info('model done')
-
-
-        X, sr = librosa.load(
-            filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
         
         
         if X.ndim == 1:
@@ -273,16 +377,9 @@ def inference(request):
         # if(audio_format2=="Type Err"):
 
         #     return JsonResponse({"error":"wrong type error"},status = 411)
-        X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
-        logger.info(X_spec.dtype)
-
-        sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
-
-        y_spec, v_spec = sp.separate_tta(X_spec)
-        logger.info(y_spec.ndim)
-        logger.info(y_spec.dtype)
-        print('inverse stft of instruments...', end=' ')
         
+        print('inverse stft of instruments...', end=' ')
+        y_spec,v_spec = vocal_removal(filename=filename)
         if(isUser!="true"):
             logger.info('MR loading...')
             waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
@@ -349,124 +446,16 @@ def inference(request):
         s3.upload_file(compressed_vocal_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("vocal압축파일 aws업로드 완료")
 
-        # compressed_f0_file=tmp_path+"/compressed_f0.7z"
-        # folder_to_7z(tmp_path+"/f0",compressed_f0_file)
-        
-        # s3_key = "spect/"+str(uuid)
-        # s3.upload_file(compressed_f0_file,Bucket = "songssam.site",Key=s3_key)
         logger.info("f0압축파일 aws업로드 완료")
-        #silent_noise폴더 비우기
-        # delete_files_in_folder(tmp_path+"/slient_noise")
         logger.info("tmp폴더 비우기")
         delete_files_in_folder(tmp_path)
         logger.info(df_json)
         return JsonResponse({"message":df_json},status=200)
-        # send_post_request(data,200,uuid)
 
     except Exception as e:
         error_message = str(e)
         logger.error(error_message)
-        # send_post_request([],848,uuid)
         return JsonResponse({"error":"error"},status = 411)
-    
-class SvcDDSP:
-    def __init__(self, model_path, vocoder_based_enhancer, enhancer_adaptive_key, input_pitch_extractor,
-                 f0_min, f0_max, threhold, spk_id, spk_mix_dict, enable_spk_id_cover):
-        self.model_path = model_path
-        self.vocoder_based_enhancer = vocoder_based_enhancer
-        self.enhancer_adaptive_key = enhancer_adaptive_key
-        self.input_pitch_extractor = input_pitch_extractor
-        self.f0_min = f0_min
-        self.f0_max = f0_max
-        self.threhold = threhold
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.spk_id = spk_id
-        self.spk_mix_dict = spk_mix_dict
-        self.enable_spk_id_cover = enable_spk_id_cover
-        
-        # load ddsp model
-        self.model, self.args = load_model(self.model_path, device=self.device)
-        
-        # load units encoder
-        if self.args.data.encoder == 'cnhubertsoftfish':
-            cnhubertsoft_gate = self.args.data.cnhubertsoft_gate
-        else:
-            cnhubertsoft_gate = 10
-        self.units_encoder = Units_Encoder(
-            self.args.data.encoder,
-            self.args.data.encoder_ckpt,
-            self.args.data.encoder_sample_rate,
-            self.args.data.encoder_hop_size,
-            cnhubertsoft_gate=cnhubertsoft_gate,
-            device=self.device)
-        
-        # load enhancer
-        if self.vocoder_based_enhancer:
-            self.enhancer = Enhancer(self.args.enhancer.type, self.args.enhancer.ckpt, device=self.device)
-
-    def infer(self, input_wav, pitch_adjust, speaker_id, safe_prefix_pad_length):
-        print("Infer!")
-        # load input
-        audio, sample_rate = librosa.load(input_wav, sr=None, mono=True)
-        if len(audio.shape) > 1:
-            audio = librosa.to_mono(audio)
-        hop_size = self.args.data.block_size * sample_rate / self.args.data.sampling_rate
-        
-        # safe front silence
-        if safe_prefix_pad_length > 0.03:
-            silence_front = safe_prefix_pad_length - 0.03
-        else:
-            silence_front = 0
-            
-        # extract f0
-        pitch_extractor = F0_Extractor(
-            self.input_pitch_extractor,
-            sample_rate,
-            hop_size,
-            float(self.f0_min),
-            float(self.f0_max))
-        f0 = pitch_extractor.extract(audio, uv_interp=True, device=self.device, silence_front=silence_front)
-        f0 = torch.from_numpy(f0).float().to(self.device).unsqueeze(-1).unsqueeze(0)
-        f0 = f0 * 2 ** (float(pitch_adjust) / 12)
-        
-        # extract volume
-        volume_extractor = Volume_Extractor(hop_size)
-        volume = volume_extractor.extract(audio)
-        mask = (volume > 10 ** (float(self.threhold) / 20)).astype('float')
-        mask = np.pad(mask, (4, 4), constant_values=(mask[0], mask[-1]))
-        mask = np.array([np.max(mask[n : n + 9]) for n in range(len(mask) - 8)])
-        mask = torch.from_numpy(mask).float().to(self.device).unsqueeze(-1).unsqueeze(0)
-        mask = upsample(mask, self.args.data.block_size).squeeze(-1)
-        volume = torch.from_numpy(volume).float().to(self.device).unsqueeze(-1).unsqueeze(0)
-
-        # extract units
-        audio_t = torch.from_numpy(audio).float().unsqueeze(0).to(self.device)
-        units = self.units_encoder.encode(audio_t, sample_rate, hop_size)
-        
-        # spk_id or spk_mix_dict
-        if self.enable_spk_id_cover:
-            spk_id = self.spk_id
-        else:
-            spk_id = speaker_id
-        spk_id = torch.LongTensor(np.array([[spk_id]])).to(self.device)
-        
-        # forward and return the output
-        with torch.no_grad():
-            output, _, (s_h, s_n) = self.model(units, f0, volume, spk_id = spk_id, spk_mix_dict = self.spk_mix_dict)
-            output *= mask
-            if self.vocoder_based_enhancer:
-                output, output_sample_rate = self.enhancer.enhance(
-                    output, 
-                    self.args.data.sampling_rate, 
-                    f0, 
-                    self.args.data.block_size,
-                    adaptive_key = self.enhancer_adaptive_key,
-                    silence_front = silence_front)
-            else:
-                output_sample_rate = self.args.data.sampling_rate
-
-            output = output.squeeze().cpu().numpy()
-            return output, output_sample_rate
         
 use_vocoder_based_enhancer = True
 
@@ -507,8 +496,6 @@ def voice_change_model(request):
     else:
         logger.info("folder already exists")
 
-    
-
     root = os.path.abspath('.')
     tmp_path = root+"/songssam/tmp2"
     mp3_filename = tmp_path+"/Origin.mp3"
@@ -517,63 +504,9 @@ def voice_change_model(request):
     s3.download_file(bucket,f_wave_path,mp3_filename)
     # 별도의 변수를 io.BytesIO 객체로 초기화(이후에 wav 데이터로 사용됨)
     wav_data = tmp_path+"/Wav.wav"
-    
-        # 음성 변환에 필요한 매개변수 설정
-    args = easydict.EasyDict({
-        "pretrained_model" : root+'/songssam/models/baseline.pth',
-        "sr" : 44100,
-        "n_fft" : 2048,
-        "hop_length" : 1024,
-        "batchsize" : 4,
-        "cropsize" : 256,
-        "postprocess" : 'store_true'
-    })
-    
-    # 모델 로드
-    print('loading model...', end=' ')
-    model = nets.CascadedNet(args.n_fft, 32, 128)
-    model.load_state_dict(torch.load(args.pretrained_model))
 
-    gpu = 0
-    
-    print('loading model...', end=' ')
-    device = torch.device('cpu')
-    model = nets.CascadedNet(args.n_fft, 32, 128)
-    model.load_state_dict(torch.load(args.pretrained_model, map_location=device))
-    if gpu >= 0:
-        if torch.cuda.is_available():
-            device = torch.device('cuda:{}'.format(gpu))
-            model.to(device)
-        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-            device = torch.device('mps')
-            model.to(device)
+    y_spec, v_spec = vocal_removal(mp3_filename)
 
-    logger.info('model done')
-
-    # mp3 파일 로드
-    X, sr = librosa.load(
-        mp3_filename, sr=args.sr, mono=True, dtype=np.float32, res_type='kaiser_fast')
-    
-    # 모노 오디오를 스테레오로 변환
-    if X.ndim == 1:
-        X = np.asarray([X, X])
-    logger.info(X.ndim)
-
-    # 파일 형식 검출
-    audio_format2 = detect_file_type(mp3_filename)
-    logger.info(audio_format2)
-
-    # 음성 데이터를 스펙트럼으로 변환
-    X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
-    logger.info(X_spec.dtype)
-
-    # 분리기를 이용하여 스펙트럼 분리
-    sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
-    y_spec, v_spec = sp.separate_tta(X_spec)
-
-
-    logger.info(y_spec.ndim)
-    logger.info(y_spec.dtype)
     print('inverse stft of instruments...', end=' ')
     
 
@@ -624,10 +557,9 @@ def voice_change_model(request):
 
     audio_bytes = combined_audio.export(format='mp3').read()
 
-    response = HttpResponse(content=audio_bytes, content_type='audio/mpeg')
-
+    response = HttpResponse(content=audio_bytes, content_type='audio/mp3')
     return response
- 
+
 
 def filter(filepath,threshold):
     for root, dirs, files in os.walk(filepath+"/raw"):
