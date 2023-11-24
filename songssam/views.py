@@ -338,7 +338,7 @@ def vocal_removal(filename):
     sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
     X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
     y_spec, v_spec = sp.separate_tta(X_spec)
-    return y_spec,v_spec
+    return y_spec,v_spec, sr
 
 @csrf_exempt
 @api_view(['POST'])
@@ -378,7 +378,7 @@ def inference(request):
         #     return JsonResponse({"error":"wrong type error"},status = 411)
         
         print('inverse stft of instruments...', end=' ')
-        y_spec,v_spec = vocal_removal(filename=filename)
+        y_spec,v_spec,sr = vocal_removal(filename=filename)
         if(isUser!="true"):
             logger.info('MR loading...')
             waveT = spec_utils.spectrogram_to_wave(y_spec, hop_length=args.hop_length)
@@ -504,7 +504,7 @@ def voice_change_model(request):
     # 별도의 변수를 io.BytesIO 객체로 초기화(이후에 wav 데이터로 사용됨)
     wav_data = tmp_path+"/Wav.wav"
 
-    y_spec, v_spec = vocal_removal(mp3_filename)
+    y_spec, v_spec,sr = vocal_removal(mp3_filename)
 
     print('inverse stft of instruments...', end=' ')
     
