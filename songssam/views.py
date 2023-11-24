@@ -38,7 +38,7 @@ import audioread
 logger = logging.getLogger(__name__)
 s3 = boto3.client('s3',aws_access_key_id='AKIATIVNZLQ22ODM76PP',aws_secret_access_key='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')
 bucket = "songssam.site"
-
+root = os.path.abspath('.')
 args = easydict.EasyDict({
         "pretrained_model" : root+'/songssam/models/baseline.pth',
         "sr" : 44100,
@@ -318,7 +318,6 @@ def load_audio_file(file_path, target_sr=None):
     return librosa.core.audio.__audioread_load(audio_data, target_sr, mono=False),sr
 
 def vocal_removal(filename):
-    root = os.path.abspath('.')
 
     gpu = 0
     
