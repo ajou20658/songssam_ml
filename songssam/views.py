@@ -475,10 +475,10 @@ spk_mix_dict = None
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(['POST'])
 def voice_change_model(request):
     # 요청에서 쿼리 파라미터를 추출하여 InferSerializer로 변환
-    serializer = InferSerializer(data=request.GET)
+    serializer = InferSerializer(data=request.data)
 
     # serializer가 유효한지 확인
     if serializer.is_valid():
@@ -559,7 +559,7 @@ def voice_change_model(request):
     combined_audio.export("output.mp3", format='mp3')
     s3.upload_file("output.mp3", bucket, "generated/"+uuid)
     logger.info('응답 성공')
-    response = HttpResponse(uuid, status=200)
+    response = JsonResponse({"uuid":uuid}, status=200)
     return response
 
 
