@@ -546,7 +546,7 @@ def voice_change_model(request):
     
     
     _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
-    logger.info('생성 완료 loading...')
+    logger.info('생성 완료')
     torch.cuda.empty_cache()
     tar_audio = librosa.resample(_audio, orig_sr =_model_sr, target_sr=daw_sample)
     generated_path = tmp_path+"/gen.wav"
@@ -555,10 +555,11 @@ def voice_change_model(request):
     mr_audio = AudioSegment.from_file(MR_file_path, format="wav")
     gen_audio = AudioSegment.from_file(generated_path, format="wav")
     combined_audio = mr_audio.overlay(gen_audio, position=0)
-
-    audio_bytes = combined_audio.export(format='mp3').read()
-
-    response = HttpResponse(content=audio_bytes, content_type='audio/mp3')
+    
+    audio_bytes = combined_audio.export("output.mp3",format='mp3')
+    s3.client("output.mp3",bucket,"generated/"+uuid)
+    logger.info('응답 성공')
+    response = HttpResponse(uuid,status=200)
     return response
 
 
