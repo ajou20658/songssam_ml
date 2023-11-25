@@ -556,10 +556,10 @@ def voice_change_model(request):
     gen_audio = AudioSegment.from_file(generated_path, format="wav")
     combined_audio = mr_audio.overlay(gen_audio, position=0)
     
-    audio_bytes = combined_audio.export("output.mp3",format='mp3')
-    s3.client("output.mp3",bucket,"generated/"+uuid)
+    combined_audio.export("output.mp3", format='mp3')
+    s3.upload_file("output.mp3", bucket, "generated/"+uuid)
     logger.info('응답 성공')
-    response = HttpResponse(uuid,status=200)
+    response = HttpResponse(uuid, status=200)
     return response
 
 
