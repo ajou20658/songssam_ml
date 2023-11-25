@@ -338,6 +338,7 @@ def vocal_removal(filename):
     sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
     X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
     y_spec, v_spec = sp.separate_tta(X_spec)
+    torch.cuda.empty_cache()
     return y_spec,v_spec, sr
 
 @csrf_exempt
@@ -546,6 +547,7 @@ def voice_change_model(request):
     
     _audio, _model_sr = svc_model.infer(input_wav_read, f_pitch_change, int_speak_id, f_safe_prefix_pad_length)
     logger.info('생성 완료 loading...')
+    torch.cuda.empty_cache()
     tar_audio = librosa.resample(_audio, orig_sr =_model_sr, target_sr=daw_sample)
     generated_path = tmp_path+"/gen.wav"
     sf.write(generated_path, tar_audio, samplerate=daw_sample, format="wav")
