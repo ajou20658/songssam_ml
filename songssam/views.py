@@ -365,12 +365,6 @@ def inference(request):
     s3.download_file(bucket,fileKey,filename)
     try:
         
-        # input_resource = wave.open(filename,'rb')
-
-        
-        
-        
-        logger.info(X.ndim)
         audio_format2 = detect_file_type(filename)
         logger.info(audio_format2)
         # logger.info("file data, sr extract...")
