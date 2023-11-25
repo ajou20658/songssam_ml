@@ -334,7 +334,9 @@ def vocal_removal(filename):
             model.to(device)
     X, sr = librosa.load(
             filename, sr=args.sr, mono=False, dtype=np.float32, res_type='kaiser_fast')
-        
+    if X.ndim == 1:
+        # mono to stereo
+            X = np.asarray([X, X])
     sp = Separator(model, device, args.batchsize, args.cropsize, args.postprocess)
     X_spec = spec_utils.wave_to_spectrogram(X, args.hop_length, args.n_fft)
     y_spec, v_spec = sp.separate_tta(X_spec)
@@ -367,9 +369,7 @@ def inference(request):
 
         
         
-        if X.ndim == 1:
-        # mono to stereo
-            X = np.asarray([X, X])
+        
         logger.info(X.ndim)
         audio_format2 = detect_file_type(filename)
         logger.info(audio_format2)
