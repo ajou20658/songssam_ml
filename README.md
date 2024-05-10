@@ -2,9 +2,12 @@
 
 ## 파란학기 SongSSam 프로젝트의 모델 서빙을 위한 서버
 ## 목차
-[API 명세](#API-명세)
+[API 명세](#api-명세)
+
+[Spring-Django 요청 흐름](#spring과-django의-요청-흐름도)
 
 [전처리 순서도](#음성-파일-전처리-순서도)
+
 
 ## API 명세
 ### 전처리 요청
@@ -55,6 +58,9 @@
     "Error": "error"
   }
   ```
+## Spring과 Django의 요청 흐름도
+<img src="https://github.com/ajou20658/song_server/assets/48721887/75aaddcd-134d-4a5d-8559-f2080a8c7719" width="100%"  style="background-color: #ffffff; padding-top:10px;">
+
 ## 음성 파일 전처리 순서도
 ![image](https://github.com/ajou20658/songssam_ml/assets/48721887/50d73898-0661-4b7b-a907-b4fb5b1d8ea8)
 <img src="https://capsule-render.vercel.app/api?type=waving&color=037bfc&height=150&section=footer" />
